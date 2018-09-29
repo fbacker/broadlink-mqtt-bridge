@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>MQTT Broadlink Bridge</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+        body {
+            padding: 30px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+
+</head>
+
+<body>
+
+    <h1>MQTT Broadlink Bridge</h1>
+    <p>Publish actions to MQTT or use this WebGUI to record and replay actions for Broadlink devices.</p>
+
+    <div class="tab-content" id="pills-tabContent">
+        <h4>Publish to MQTT</h4>
+        <form id="formPublish">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="configMQTT"></span>
+                            </div>
+                            <input type="input" required class="form-control" id="inputTopic" aria-describedby="topicHelp"
+                                placeholder="Enter Topic">
+                            <small id="topicHelp" class="form-text text-muted">Topic will auto start with 'broadlink/',
+                                So you will add device name/action.
+                                <br />E.g. tv/samsung/power</small>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary" id="recordIR">Record IR</button>
+                            <button type="submit" class="btn btn-primary" id="recordRF">Record RF</button>
+                            <button type="submit" class="btn btn-info" id="play">Play</button>
+                            <button type="button" class="btn btn-info" id="list">List actions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <h4>Logs</h4>
+        <ul id="logs" class="list-group">
+        </ul>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        $(function () {
+            var config = null;
+            var socket = io();
+            socket.on('connection', function (socket) {
+                // connected
+            });
+            socket.on('log', function (msg) {
+                // nice colors
+                var color = msg.level;
+                if (color === "error") color = "warning";
+                if (color === "debug") color = "light";
+                // Is there a object
+                var obj = Object.assign({}, msg);
+                delete obj.message;
+                delete obj.level;
+                delete obj.transport;
+                if (Object.keys(obj).length !== 0) {
+                    obj = `<pre>${JSON.stringify(obj, undefined, 2)}</pre>`;
+                } else {
+                    obj = '';
+                }
+
+                var obj = `<li class=\"list-group-item bg-${color}\">${msg.message} ${obj}</li>`;
+                $("#logs").prepend(obj);
+            });
+            socket.on('config', function (msg) {
+                config = msg;
+                $("#configMQTT").text(`${config.mqtt.subscribeBasePath}/`);
+                var obj = `<li class=\"list-group-item bg-success\">Config is loaded</li>`;
+                $("#logs").prepend(obj);
+            });
+            socket.on('actions', function (msg) {
+                console.log('actions that can be played', msg)
+            });
+
+            $("#list").click(function () {
+                socket.emit('getActions');
+            });
+            $("form button[type=submit]").click(function () {
+                $("button[type=submit]", $(this).parents("form")).removeAttr("clicked");
+                $(this).attr("clicked", "true");
+            });
+            $('#formPublish').submit(function (e) {
+                e.preventDefault();
+                if (config === null) {
+                    alert('Config is missing. It hasn\'t been loaded yet');
+                    return;
+                }
+
+                var action = $("#formPublish button[type=submit][clicked=true]").attr('id').toLowerCase();
+                var topic = config.mqtt.subscribeBasePath + '/' + $("#inputTopic").val();
+                socket.emit('action', { action, topic });
+            });
+        });
+    </script>
+</body>
+
+</html>

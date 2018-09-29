@@ -1,0 +1,17 @@
+{
+  "name": "broadlink-mqtt-bridge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "broadlinkjs-rm": "^0.6.0",
+    "circular-json": "^0.5.5",
+    "config": "^2.0.1",
+    "express": "^4.16.3",
+    "mqtt": "^2.18.8",
+    "shelljs": "^0.8.2",
+    "socket.io": "^2.1.1",
+    "winston": "^3.1.0"
+  }
+}
