@@ -15,16 +15,14 @@ There is a couple of options.
 ## Manually
 
 ```js
-git clone ''
-cd ''
+git clone 'https://github.com/fbacker/broadlink-mqtt-bridge.git'
+cd 'broadlink-mqtt-bridge'
 node index.js
 ```
 
 ## Docker
 
-```js
-totooo;
-```
+@TODO create Dockerfile
 
 # Configure
 
