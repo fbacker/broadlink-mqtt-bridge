@@ -1,3 +1,6 @@
+// If docker, config files are in another dir
+console.log("env", process.env);
+
 // Make the imports
 const config = require("config");
 const winston = require("winston");
@@ -12,8 +15,19 @@ const socket = require("socket.io");
 const bodyParser = require("body-parser");
 const broadlink = require("./device");
 
-var io = null;
+let cfg = config.util.toObject();
 
+if (process.env.DOCKER && process.env.DOCKER === "true") {
+  //  process.env["NODE_CONFIG_DIR"] = "/config";
+  const cfgLocal = config.util.loadFileConfigs("/config");
+  if (cfgLocal) {
+    cfg = Object.assign({}, cfg, cfgLocal);
+  }
+}
+
+var io = null;
+const commandsPath = cfg.recording.path || path.join(__dirname, "commands");
+console.log("commandsPath", commandsPath);
 // -------------------------------------
 //      SETUP LOGGER with Winston
 // -------------------------------------
@@ -62,7 +76,7 @@ logger.info("Starting Broadlink MQTT NodeJS Application");
 // If you want to listen to MQTT events listen to mqtt.subscribeBasePath/#
 // E.g. broadlink/#
 
-var mqttOptions = config.util.cloneDeep(config.get("mqtt"));
+var mqttOptions = cfg.mqtt;
 logger.info("MQTT Options", mqttOptions);
 
 var mqttClient = mqtt.connect(
@@ -152,15 +166,15 @@ app.use(bodyParser.json());
 
 // server is alive
 var server = http.createServer(app);
-server.listen(config.get("gui.port"), () =>
-  logger.info(`GUI Web listen on port ${config.get("gui.port")}`)
+server.listen(cfg.gui.port, () =>
+  logger.info(`GUI Web listen on port ${cfg.gui.port}`)
 );
 
 // websocket actions
 io = socket.listen(server);
 io.on("connection", function(socket) {
   logger.info("Web a client connected");
-  io.emit("config", config.util.toObject());
+  io.emit("config", cfg);
   socket.on("disconnect", function() {
     logger.info("Web a client disconnected");
   });
@@ -316,7 +330,7 @@ const prepareAction = data =>
       const actionPath = data.topic.substr(
         mqttOptions.subscribeBasePath.length + 1
       );
-      const filePath = path.join(__dirname, "commands", actionPath) + ".bin";
+      const filePath = path.join(commandsPath, actionPath) + ".bin";
       const folderPath = filePath.substr(0, filePath.lastIndexOf("/"));
       data = Object.assign({}, data, {
         path: actionPath,
@@ -389,7 +403,7 @@ const recordSave = data =>
 const recordIR = data =>
   new Promise((resolve, reject) => {
     logger.info("recordIR: Press an IR signal");
-    let timeout = config.get("recording.timeout.ir");
+    let timeout = cfg.recording.timeout.ir;
     let intervalSpeed = 2;
     let interval = setInterval(() => {
       logger.info("recordIR: Timeout in " + timeout);
@@ -414,7 +428,7 @@ const recordIR = data =>
 const recordRFCode = data =>
   new Promise((resolve, reject) => {
     logger.info("recordRFCode: Press RF button");
-    let timeout = config.get("recording.timeout.rf");
+    let timeout = cfg.recording.timeout.rf;
     let intervalSpeed = 2;
     let interval = setInterval(() => {
       logger.info("recordRFCode: Timeout in " + timeout);
@@ -440,7 +454,7 @@ const recordRFCode = data =>
 const recordRFFrequence = data =>
   new Promise((resolve, reject) => {
     logger.info("recordRFFrequence: Hold and RF button");
-    let timeout = config.get("recording.timeout.rf");
+    let timeout = cfg.recording.timeout.rf;
     let intervalSpeed = 2;
     let interval = setInterval(() => {
       logger.info("recordRFFrequence: Timeout in " + timeout);

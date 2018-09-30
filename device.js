@@ -1,5 +1,6 @@
 // from: https://raw.githubusercontent.com/lprhodes/homebridge-broadlink-rm/master/helpers/getDevice.js
 const BroadlinkJS = require("broadlinkjs-rm");
+//const BroadlinkJS = require("./broadlink");
 const broadlink = new BroadlinkJS();
 const EventEmitter = require("events");
 const myEmitter = new EventEmitter();

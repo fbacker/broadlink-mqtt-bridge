@@ -22,13 +22,23 @@ node index.js
 
 ## Docker
 
-@TODO create Dockerfile
+@TODO create Dockerfile that works
 
 # Configure
 
 in ./config there's a couple of options in default.json. Do not change this. This is the default settings that can be changed.
-
 Make your own file ./config/local.json and only add and change values that you want. This will solve issues with upgrades.
+
+**NOTE:** if running 'manual' git repo. Please make sure to set a custom path where to place the commands. If you want to use the same directory as application set null.
+
+```js
+// manually running, setting commands saved path to __dirname/commands
+{
+  "recording": {
+    "path": null
+  }
+}
+```
 
 # Running
 

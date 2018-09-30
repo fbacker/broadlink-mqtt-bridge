@@ -94,6 +94,7 @@
             });
             socket.on('config', function (msg) {
                 config = msg;
+                console.log('config', msg)
                 $("#configMQTT").text(`${config.mqtt.subscribeBasePath}/`);
                 var obj = `<li class=\"list-group-item bg-success\">Config is loaded</li>`;
                 $("#logs").prepend(obj);
