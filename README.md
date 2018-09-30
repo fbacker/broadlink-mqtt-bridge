@@ -17,6 +17,7 @@ There is a couple of options.
 ```js
 git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
 cd broadlink-mqtt-bridge
+npm install
 node index.js
 ```
 

@@ -418,8 +418,8 @@ const recordIR = data =>
 
     device.on("rawData", dataRaw => {
       clearInterval(interval);
-      logger.debug("Broadlink RAW");
-      data.signal = dataRaw.toString();
+      logger.debug("Broadlink IR RAW");
+      data.signal = dataRaw;
       resolve(data);
     });
   });
@@ -443,8 +443,8 @@ const recordRFCode = data =>
 
     // IR or RF signal found
     device.on("rawData", dataRaw => {
-      logger.debug("Broadlink RAW");
-      data.signal = dataRaw.toString();
+      logger.debug("Broadlink RF RAW");
+      data.signal = dataRaw;
       clearInterval(interval);
       resolve(data);
     });
@@ -470,7 +470,6 @@ const recordRFFrequence = data =>
     // RF Sweep found something
     device.on("rawRFData", dataRaw => {
       clearInterval(interval);
-      logger.debug("#2 Broadlink RAW RF", dataRaw);
       data.frq = dataRaw;
       resolve(data);
     });
@@ -478,6 +477,7 @@ const recordRFFrequence = data =>
 
 const playAction = data =>
   new Promise((resolve, reject) => {
+    logger.info("playAction");
     fs.readFile(data.filePath, (err, fileData) => {
       if (err) {
         logger.error("Failed to read file", { err });
@@ -504,7 +504,8 @@ const handleListAllActions = data =>
 const mqttPublish = data =>
   new Promise((resolve, reject) => {
     if (data.origin !== "mqtt") {
-      logger.info("broadcast action, how to");
+      //@TODO implement
+      //logger.info("broadcast action, how to");
       //mqttClient.publish()
     }
     resolve(data);
