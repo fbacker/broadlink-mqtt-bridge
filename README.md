@@ -15,10 +15,21 @@ There is a couple of options.
 ## Manually
 
 ```js
+// install
 git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
 cd broadlink-mqtt-bridge
 npm install
+
+// overwrite configs
+nano ./config/local.json
+
+// test run the app
 node index.js
+
+
+// add to run at reboot
+crontab -e
+@reboot cd /home/openhabian/broadlink-mqtt-bridge && node index.js < /dev/null &
 ```
 
 ## Docker

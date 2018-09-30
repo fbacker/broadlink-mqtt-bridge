@@ -404,7 +404,7 @@ const recordIR = data =>
   new Promise((resolve, reject) => {
     logger.info("recordIR: Press an IR signal");
     let timeout = cfg.recording.timeout.ir;
-    let intervalSpeed = 2;
+    let intervalSpeed = 1;
     let interval = setInterval(() => {
       logger.info("recordIR: Timeout in " + timeout);
       device.checkData();
@@ -416,38 +416,45 @@ const recordIR = data =>
       }
     }, intervalSpeed * 1000);
 
-    device.on("rawData", dataRaw => {
+    // IR signal received
+    const callback = dataRaw => {
       clearInterval(interval);
       logger.debug("Broadlink IR RAW");
+      device.emitter.off("rawData", callback);
       data.signal = dataRaw;
       resolve(data);
-    });
+    };
+    device.on("rawData", callback);
   });
 
 // Record RF Signal (after a frequence is found)
 const recordRFCode = data =>
   new Promise((resolve, reject) => {
     logger.info("recordRFCode: Press RF button");
-    let timeout = cfg.recording.timeout.rf;
-    let intervalSpeed = 2;
-    let interval = setInterval(() => {
-      logger.info("recordRFCode: Timeout in " + timeout);
-      device.checkData();
-      timeout -= intervalSpeed;
-      if (timeout <= 0) {
-        clearInterval(interval);
-        logger.error("RF Timeout");
-        reject("Stopped at recordRFCode");
-      }
-    }, intervalSpeed * 1000);
+    setTimeout(() => {
+      let timeout = cfg.recording.timeout.rf;
+      let intervalSpeed = 1;
+      let interval = setInterval(() => {
+        logger.info("recordRFCode: Timeout in " + timeout);
+        device.checkData();
+        timeout -= intervalSpeed;
+        if (timeout <= 0) {
+          clearInterval(interval);
+          logger.error("RF Timeout");
+          reject("Stopped at recordRFCode");
+        }
+      }, intervalSpeed * 1000);
 
-    // IR or RF signal found
-    device.on("rawData", dataRaw => {
-      logger.debug("Broadlink RF RAW");
-      data.signal = dataRaw;
-      clearInterval(interval);
-      resolve(data);
-    });
+      // IR or RF signal found
+      const callback = dataRaw => {
+        logger.debug("Broadlink RF RAW");
+        data.signal = dataRaw;
+        clearInterval(interval);
+        device.emitter.off("rawData", callback);
+        resolve(data);
+      };
+      device.on("rawData", callback);
+    }, 3000);
   });
 
 // Record RF, scans for frequence
@@ -455,7 +462,7 @@ const recordRFFrequence = data =>
   new Promise((resolve, reject) => {
     logger.info("recordRFFrequence: Hold and RF button");
     let timeout = cfg.recording.timeout.rf;
-    let intervalSpeed = 2;
+    let intervalSpeed = 1;
     let interval = setInterval(() => {
       logger.info("recordRFFrequence: Timeout in " + timeout);
       device.checkRFData();
@@ -468,11 +475,13 @@ const recordRFFrequence = data =>
     }, intervalSpeed * 1000);
 
     // RF Sweep found something
-    device.on("rawRFData", dataRaw => {
+    const callback = dataRaw => {
       clearInterval(interval);
+      device.emitter.off("rawRFData", callback);
       data.frq = dataRaw;
       resolve(data);
-    });
+    };
+    device.on("rawRFData", callback);
   });
 
 const playAction = data =>
