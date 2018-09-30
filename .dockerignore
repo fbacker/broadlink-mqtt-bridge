@@ -1,6 +1,5 @@
 commands
-config
-!config/default.json
+config/local.json
 node_modules
 *.log
 tmp-*

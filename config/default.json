@@ -1,0 +1,18 @@
+{
+  "mqtt": {
+    "host": "127.0.0.1",
+    "port": 1883,
+    "protocol": "mqtt",
+    "subscribeBasePath": "broadlink"
+  },
+  "recording": {
+    "timeout": {
+      "ir": 30,
+      "rf": 30
+    },
+    "path": "/commands"
+  },
+  "gui": {
+    "port": 3000
+  }
+}

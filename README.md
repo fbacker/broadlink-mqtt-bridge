@@ -15,8 +15,8 @@ There is a couple of options.
 ## Manually
 
 ```js
-git clone 'https://github.com/fbacker/broadlink-mqtt-bridge.git'
-cd 'broadlink-mqtt-bridge'
+git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
+cd broadlink-mqtt-bridge
 node index.js
 ```
 
