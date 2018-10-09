@@ -189,3 +189,4 @@ Selection item=FanSpeed mappings=[1="1", 2="2", 3="3", 4="4", 5="5", 6="6"]
 - [ ] Create Docker
 - [ ] Cleanup project
 - [ ] Make GUI pretty
+- [ ] OpenHAB RPI AutoInstall Script
