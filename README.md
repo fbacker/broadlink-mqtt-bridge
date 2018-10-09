@@ -5,7 +5,7 @@ This tool helps you to record and play Broadlink actions via MQTT or Admin GUI.
 
 You will be able with the filetree see all recorded actions, delete actions and if a disclamation mark occures, this means that the action is a duplicate of another.
 
-![admin gui](https://github.com/fbacker/broadlink-mqtt-bridge/raw/master/github/overview.png)
+![admin gui](https://github.com/fbacker/broadlink-mqtt-bridge/raw/master/github/overview1.png)
 
 ### Requirements
 
