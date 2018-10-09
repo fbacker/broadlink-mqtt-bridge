@@ -1,6 +1,11 @@
 # MQTT - Broadlink
 
 Yet another MQTT - Broadlink Bridge for helping OpenHAB.
+This tool helps you to record and play Broadlink actions via MQTT or Admin GUI.
+
+You will be able with the filetree see all recorded actions, delete actions and if a disclamation mark occures, this means that the action is a duplicate of another.
+
+![admin gui](https://github.com/fbacker/broadlink-mqtt-bridge/raw/master/github/overview.png)
 
 ### Requirements
 
@@ -21,6 +26,7 @@ cd broadlink-mqtt-bridge
 npm install
 
 // overwrite configs
+// NOTE: you must set recording path
 nano ./config/local.json
 
 // test run the app
@@ -28,13 +34,14 @@ node index.js
 
 
 // add to run at reboot
+// example for linux (e.g. openhab2 on RPI)
 crontab -e
 @reboot cd /home/openhabian/broadlink-mqtt-bridge && node index.js < /dev/null &
 ```
 
 ## Docker
 
-@TODO create Dockerfile that works
+This is on the works
 
 # Configure
 
@@ -54,15 +61,17 @@ Make your own file ./config/local.json and only add and change values that you w
 
 # Running
 
-There's a couple of ways to interact.
+There's a couple of ways to interact. Web GUI, Websockets, Rest API and with MQTT.
 
-## Web
+## Web (best for Recording)
 
 Most output and simple is running the web gui. This will output everything from logs and GUI to trigger actions. Possible to change port in config.
 
 http://localhost:3000/
 
 ## WebSocket
+
+Could be good for something right?
 
 Look at ./html/index.html for example. You can call actions and listen to logs.
 
@@ -126,20 +135,57 @@ curl --header "Content-Type: application/json" \
   http://localhost:3000/api/files
 ```
 
+## MQTT (best for playing)
+
+Send play, recordir or recordrf to a topic.
+
+```js
+// Example play an action
+Topic: broadlink / fan / light;
+Message: play;
+```
+
 # OpenHAB
 
 After recorded a couple of actions it's possible to use with OpenHAB. Use same MQTT server in config settings.
 
+Look at OpenHab documentation how to configure openhab with MQTT https://www.openhab.org/addons/bindings/mqtt1/
+
 ```js
-// gui.items
+/// EXAMPLE SIMPLE ACTION
+// Swap light, 1 recorded action
+
+// .items
 Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play]"}
 
-//gui.sitemap
+// .sitemap
 Frame label="Fan Livingroom"  {
     Switch item=FanLights label="Lampor" mappings=[ON="Swap"]
 }
+
+
+/// EXAMPLE ADVANCED
+// Change fan speed, 6 recorded actions
+
+// .items
+Number FanSpeed "Fan Speed [%d]"
+
+// .rules
+rule "FanSpeed"
+when
+    Item FanSpeed changed
+then
+    if (FanSpeed.state == "NULL") return; // If NULL do nothing
+    val topic = "broadlink/fans/livingroom/speed-" + FanSpeed.state
+    publish("mqtt", topic, "play")
+end
+
+// .sitemap
+Selection item=FanSpeed mappings=[1="1", 2="2", 3="3", 4="4", 5="5", 6="6"]
 ```
 
-# Thanks
+# TODOs
 
-This helper is built with https://github.com/lprhodes/broadlinkjs-rm for interaction with broadlink devices.
+- [ ] Create Docker
+- [ ] Cleanup project
+- [ ] Make GUI pretty
