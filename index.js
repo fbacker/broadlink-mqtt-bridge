@@ -13,6 +13,8 @@ const express = require("express");
 const http = require("http");
 const socket = require("socket.io");
 const bodyParser = require("body-parser");
+const md5 = require("md5");
+const md5File = require("md5-file");
 const broadlink = require("./device");
 
 let cfg = config.util.toObject();
@@ -208,7 +210,8 @@ router.post("/play", function(req, res) {
         console.error("api error", err);
         res.statusCode = 500;
         return res.json({
-          errors: ["Failed " + err]
+          errors: ["Failed " + err],
+          err
         });
       });
   } else {
@@ -229,7 +232,8 @@ router.post("/recordir", function(req, res) {
         console.error("api err", err);
         res.statusCode = 500;
         return res.json({
-          errors: ["Failed " + err]
+          errors: ["Failed " + err],
+          err
         });
       });
   } else {
@@ -250,7 +254,8 @@ router.post("/recordrf", function(req, res) {
         console.error("api error", err);
         res.statusCode = 500;
         return res.json({
-          errors: ["Failed " + err]
+          errors: ["Failed " + err],
+          err
         });
       });
   } else {
@@ -260,6 +265,38 @@ router.post("/recordrf", function(req, res) {
     });
   }
 });
+router.get("/files", function(req, res) {
+  listFilestructure("./commands")
+    .then(data => {
+      console.log("files", data);
+      res.json(data);
+    })
+    .catch(err => {
+      console.error("api:files:err", err);
+      res.statusCode = 400;
+      return res.json({
+        errors: ["Error occured"],
+        err
+      });
+    });
+});
+router.delete("/files", function(req, res) {
+  console.log("delete", req.body.file);
+  deleteFile(req.body.file)
+    .then(obj => {
+      console.log("file is removed");
+      res.json({ success: true });
+    })
+    .catch(err => {
+      console.error("api:files:delete:err", err);
+      res.statusCode = 400;
+      return res.json({
+        errors: ["Error occured"],
+        err
+      });
+    });
+});
+
 app.use("/api", router);
 
 // -------------------------------------
@@ -519,3 +556,101 @@ const mqttPublish = data =>
     }
     resolve(data);
   });
+
+// -------------- HELPERS --------------
+
+const deleteFile = path =>
+  new Promise((resolve, reject) => {
+    logger.info(`delete file  ${path}`);
+    fs.unlink(path, err => {
+      if (err) {
+        logger.error("Failed to delete file", { err });
+        reject("Stopped at deleteFile");
+        return;
+      } else {
+        resolve({});
+      }
+    });
+  });
+
+// Return json file structure
+const listFilestructure = dir => {
+  const walk = entry => {
+    return new Promise((resolve, reject) => {
+      fs.exists(entry, exists => {
+        if (!exists) {
+          return resolve({});
+        }
+        return resolve(
+          new Promise((resolve, reject) => {
+            fs.lstat(entry, (err, stats) => {
+              if (err) {
+                return reject(err);
+              }
+              if (!stats.isDirectory()) {
+                return resolve(
+                  new Promise((resolve, reject) => {
+                    md5File(entry, (err, hash) => {
+                      if (err) {
+                        return reject(err);
+                      }
+                      resolve({
+                        path: entry,
+                        type: "file",
+                        text: path.basename(entry),
+                        time: stats.mtime,
+                        size: stats.size,
+                        id: md5(entry),
+                        hash,
+                        icon:
+                          path.extname(entry) === ".bin" ? "fas fa-bolt" : null
+                      });
+                    });
+                  })
+                );
+                /*
+                return resolve({
+                  path: entry,
+                  type: "file",
+                  text: path.basename(entry),
+                  time: stats.mtime,
+                  size: stats.size,
+                  id: md5(entry),
+                  icon: path.extname(entry) === ".bin" ? "fas fa-bolt" : null
+                });
+                */
+              }
+              resolve(
+                new Promise((resolve, reject) => {
+                  fs.readdir(entry, (err, files) => {
+                    if (err) {
+                      return reject(err);
+                    }
+                    Promise.all(
+                      files.map(child => walk(path.join(entry, child)))
+                    )
+                      .then(children => {
+                        resolve({
+                          path: entry,
+                          type: "folder",
+                          text: path.basename(entry),
+                          time: stats.mtime,
+                          children,
+                          id: md5(entry)
+                        });
+                      })
+                      .catch(err => {
+                        reject(err);
+                      });
+                  });
+                })
+              );
+            });
+          })
+        );
+      });
+    });
+  };
+
+  return walk(dir);
+};

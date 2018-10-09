@@ -10,66 +10,85 @@
         body {
             padding: 30px;
         }
+        .icon-duplicate {
+            position: relative;
+            left: -6px;
+            width: 0px;
+            font-size: 9px;
+        }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+        crossorigin="anonymous">
 </head>
 
 <body>
 
-    <h1>MQTT Broadlink Bridge</h1>
-    <p>Publish actions to MQTT or use this WebGUI to record and replay actions for Broadlink devices.</p>
 
-    <div class="tab-content" id="pills-tabContent">
-        <h4>Publish to MQTT</h4>
-        <form id="formPublish">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="configMQTT"></span>
-                            </div>
-                            <input type="input" required class="form-control" id="inputTopic" aria-describedby="topicHelp"
-                                placeholder="Enter Topic">
-                            <small id="topicHelp" class="form-text text-muted">Topic will auto start with 'broadlink/',
-                                So you will add device name/action.
-                                <br />E.g. tv/samsung/power</small>
-                        </div>
-                    </div>
 
-                </div>
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary" id="recordIR">Record IR</button>
-                            <button type="submit" class="btn btn-primary" id="recordRF">Record RF</button>
-                            <button type="submit" class="btn btn-info" id="play">Play</button>
-                            <button type="button" class="btn btn-info" id="list">List actions</button>
-                        </div>
-                    </div>
-                </div>
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>MQTT Broadlink Bridge</h1>
+                <p>Publish actions to MQTT or use this WebGUI to record and replay actions for Broadlink devices.</p>
             </div>
-        </form>
-        <h4>Logs</h4>
-        <ul id="logs" class="list-group">
-        </ul>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Publish to MQTT</h4>
+                <form id="formPublish">
+
+                    <div class="form-group input-group">
+                        <small id="topicHelp" class="form-text text-muted" style="padding-bottom: 20px;">Topic to
+                            broadcast. So you will add device
+                            name/action. E.g. tv/samsung/power</small>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="configMQTT"></span>
+                        </div>
+                        <input type="input" required class="form-control" id="inputTopic" aria-describedby="topicHelp"
+                            placeholder="Enter Topic">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="recordIR">Record IR</button>
+                    <button type="submit" class="btn btn-primary" id="recordRF">Record RF</button>
+                    <button type="submit" class="btn btn-info" id="play">Play</button>
+                    <button type="button" class="btn btn-info" id="list">List actions</button>
+
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h4>Actions <span><button type="button" id="btnDelete" class="btn btn-danger btn-sm" disabled>Delete</button></span></h4>
+                <div id="jstree"></div>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 20px">
+            <div class="col-12">
+                <h4>Logs</h4>
+                <ul id="logs" class="list-group">
+                </ul>
+            </div>
+        </div>
     </div>
 
-
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 
     <script>
         $(function () {
             var config = null;
             var socket = io();
+            var selectedNode = null;
+
             socket.on('connection', function (socket) {
                 // connected
             });
@@ -106,6 +125,22 @@
             $("#list").click(function () {
                 socket.emit('getActions');
             });
+            $("#btnDelete").click(function () {
+                if (!selectedNode) {
+                    alert("Please select a file in the tree");
+                    return;
+                }
+                if (confirm("Do you want to delete action " + selectedNode.path)) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/api/files",
+                        data: { file: selectedNode.path },
+                        success: () => {
+                            loadTreeData();
+                        },
+                    });
+                }
+            });
             $("form button[type=submit]").click(function () {
                 $("button[type=submit]", $(this).parents("form")).removeAttr("clicked");
                 $(this).attr("clicked", "true");
@@ -116,13 +151,108 @@
                     alert('Config is missing. It hasn\'t been loaded yet');
                     return;
                 }
-
                 var action = $("#formPublish button[type=submit][clicked=true]").attr('id').toLowerCase();
                 var topic = config.mqtt.subscribeBasePath + '/' + $("#inputTopic").val();
                 socket.emit('action', { action, topic });
             });
+
+
+            let hashList = [];
+            let hashDuplicates = [];
+
+            $.jstree.plugins.duplicate = function (options, parent) {
+                this.redraw_node = function (obj, deep, callback, force_draw) {
+                    var node_id = obj;
+                    var el = parent.redraw_node.apply(this, arguments);
+                    if (el) {
+                        var node = this._model.data[node_id];
+                        var data = (node && node.original) ? node.original : null;
+                        if (data && data.type === 'file') {
+                            if (hashDuplicates.includes(data.hash)) {
+                                $(el).find("a > i").prepend('<i class="fas fa-exclamation-triangle text-danger icon-duplicate"></i>');
+
+                            }
+                        }
+                    }
+                    return el;
+                };
+            };
+
+            const deepLookForDuplicates = function (node) {
+                if (node.type === 'file') {
+                    if (hashList.includes(node.hash)) {
+                        if (!hashDuplicates.includes(node.hash)) {
+                            hashDuplicates.push(node.hash);
+                        }
+                    }
+                    hashList.push(node.hash);
+                }
+                if (node.children) {
+                    for (let i = 0; i < node.children.length; i = i + 1) {
+                        deepLookForDuplicates(node.children[i]);
+                    }
+                }
+            }
+
+            const loadTreeData = function () {
+                $.ajax({
+                    url: '/api/files',
+                    success: function (data) {
+                        deepLookForDuplicates(data);
+                        data.state = { opened: true };
+                        $('#jstree').jstree(true).settings.core.data = data;
+                        $('#jstree').jstree(true).refresh();
+                    },
+                    dataType: 'json'
+                });
+            }
+
+            const tree = $('#jstree').jstree({
+                "core": {
+                    "animation": 100,
+                    "themes": { "stripes": true },
+                },
+                "types": {
+                    "#": {
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "icon": "far fa-th-list"
+                    },
+                    "folder": {
+                        "icon": "far fa-folder"
+                    },
+                    "file": {
+                        "icon": "far fa-file"
+                    }
+                },
+                "plugins": [
+                    "sort", "state", "types", "duplicate"
+                ]
+            });
+
+            $('#jstree').on("changed.jstree", function (e, data) {
+                if (data.node && data.node.type === "file") {
+                    let p = data.node.original.path;
+                    p = p.substr(p.indexOf("/") + 1);
+                    $("#inputTopic").val(p);
+                    $("#btnDelete").attr("disabled", false);
+                    selectedNode = data.node.original;
+                }
+                else {
+                    $("#btnDelete").attr("disabled", true);
+                    selectedNode = null;
+                }
+            });
+            $('#jstree').on("state_ready.jstree", function (e, data) {
+                loadTreeData();
+            });
+
+
+
         });
     </script>
+
 </body>
 
 </html>

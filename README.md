@@ -119,6 +119,11 @@ curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"topic":"broadlink/fan/light"}' \
   http://localhost:3000/api/recordRF
+
+// JSON Tree of files
+curl --header "Content-Type: application/json" \
+  --request GET \
+  http://localhost:3000/api/files
 ```
 
 # OpenHAB

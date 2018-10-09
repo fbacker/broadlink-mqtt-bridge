@@ -12,6 +12,8 @@
     "circular-json": "^0.5.5",
     "config": "^2.0.1",
     "express": "^4.16.3",
+    "md5": "^2.2.1",
+    "md5-file": "^4.0.0",
     "mqtt": "^2.18.8",
     "shelljs": "^0.8.2",
     "socket.io": "^2.1.1",
