@@ -10,7 +10,7 @@
       "ir": 30,
       "rf": 30
     },
-    "path": "/commands"
+    "path": null
   },
   "gui": {
     "port": 3000

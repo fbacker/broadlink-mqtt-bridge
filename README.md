@@ -17,6 +17,22 @@ You will be able with the filetree see all recorded actions, delete actions and 
 
 There is a couple of options.
 
+## Raspberry PI AutoInstaller
+
+SSH into your RPI then run the command
+```js
+bash -c "$(curl -sL https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bridge/master/installers/raspberry.sh)"
+```
+
+This will install the broadlink-mqtt-bridge project in /srv/openhab2-conf/broadlink-mqtt-bridge/. At the end of the installer you will have an option to make the project run automatic at boot.
+
+It's possible to start and stop 
+````
+/etc/init.d/broadlinkbridge
+```
+
+To upgrade to latest just run the script again.
+
 ## Manually
 
 ```js
@@ -25,13 +41,8 @@ git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
 cd broadlink-mqtt-bridge
 npm install
 
-// overwrite configs
-// NOTE: you must set recording path
-nano ./config/local.json
-
 // test run the app
 node index.js
-
 
 // add to run at reboot
 // example for linux (e.g. openhab2 on RPI)
@@ -48,16 +59,6 @@ This is on the works
 in ./config there's a couple of options in default.json. Do not change this. This is the default settings that can be changed.
 Make your own file ./config/local.json and only add and change values that you want. This will solve issues with upgrades.
 
-**NOTE:** if running 'manual' git repo. Please make sure to set a custom path where to place the commands. If you want to use the same directory as application set null.
-
-```js
-// manually running, setting commands saved path to __dirname/commands
-{
-  "recording": {
-    "path": null
-  }
-}
-```
 
 # Running
 
@@ -216,5 +217,5 @@ Selection item=FanSpeed mappings=[1="1", 2="2", 3="3", 4="4", 5="5", 6="6"]
 - [ ] Create Docker
 - [ ] Cleanup project
 - [ ] Make GUI pretty
-- [ ] OpenHAB RPI AutoInstall Script
+- [x] OpenHAB RPI AutoInstall Script
 - [x] Multiple broadlink devices
