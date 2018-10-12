@@ -118,7 +118,7 @@ mqttClient.on("message", function(topic, message) {
 // -------------------------------------
 //            Setup Broadlink
 // -------------------------------------
-let device;
+let devices = [];
 
 // after a while this is triggered
 broadlink.on("discoverCompleted", numOfDevice => {
@@ -130,10 +130,10 @@ broadlink.on("discoverCompleted", numOfDevice => {
 
 // a broadlink device is found
 broadlink.on("device", discoveredDevice => {
-  device = discoveredDevice;
-  logger.info("Broadlink Found Device", device.host);
-  device.on("temperature", temperature =>
-    logger.debug(`Broadlink Temperature ${temperature}`)
+  devices.push(discoveredDevice);
+  logger.info("Broadlink Found Device", discoveredDevice.host);
+  discoveredDevice.on("temperature", temperature =>
+    logger.debug(`Broadlink Temperature ${temperature}`,discoveredDevice.host)
   );
   /*
   // IR or RF signal found
@@ -174,19 +174,19 @@ server.listen(cfg.gui.port, () =>
 
 // websocket actions
 io = socket.listen(server);
-io.on("connection", function(socket) {
+io.on("connection", (socket)=> {
   logger.info("Web a client connected");
   io.emit("config", cfg);
-  socket.on("disconnect", function() {
+  socket.on("disconnect", ()=> {
     logger.info("Web a client disconnected");
   });
-  socket.on("action", function(msg) {
+  socket.on("action", (msg)=> {
     logger.info("Web User want action", msg);
     runAction(msg.action, msg.topic, "web")
       .then(data => console.log("web done", data))
       .catch(err => console.error("web failed", err));
   });
-  socket.on("getActions", function() {
+  socket.on("getActions", ()=> {
     logger.info("Loading saved actions");
     handleListAllActions()
       .then(files => {
@@ -195,19 +195,31 @@ io.on("connection", function(socket) {
       })
       .catch(err => logger.error("Failed to load " + err));
   });
+  socket.on('getDevices', ()=>{
+    logger.info("Loading Connected devices");
+    getDevicesInfo().then(devs=>{
+      logger.info("Connected devices", devs);
+      io.emit("devices", devs);
+    })
+    .catch(err => logger.error("Failed to load " + err));
+  })
 });
 
 // API
 var router = express.Router();
 router.post("/play", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
-    runAction("play", req.body.topic, "api")
+    let action = "play";
+    if(req.body.id){
+      action += ':'+req.body.id;
+    }
+    runAction(action, req.body.topic, "api")
       .then(() => {
         console.log("api done");
         res.json({ message: "Sending message " + req.body.topic });
       })
       .catch(err => {
-        console.error("api error", err);
+        logger.error("api play error", err);
         res.statusCode = 500;
         return res.json({
           errors: ["Failed " + err],
@@ -223,13 +235,17 @@ router.post("/play", function(req, res) {
 });
 router.post("/recordir", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
-    runAction("recordir", req.body.topic, "api")
+    let action = "recordir";
+    if(req.body.id){
+      action += ':'+req.body.id;
+    }
+    runAction(action, req.body.topic, "api")
       .then(data => {
         console.log("api done", data);
         res.json({ message: "Sending message " + req.body.topic });
       })
       .catch(err => {
-        console.error("api err", err);
+        logger.error("api recordir error", err);
         res.statusCode = 500;
         return res.json({
           errors: ["Failed " + err],
@@ -245,13 +261,17 @@ router.post("/recordir", function(req, res) {
 });
 router.post("/recordrf", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
-    runAction("recordrf", req.body.topic, "api")
+    let action = "recordrf";
+    if(req.body.id){
+      action += ':'+req.body.id;
+    }
+    runAction(action, req.body.topic, "api")
       .then(data => {
         console.log("api done", data);
         res.json({ message: "Sending message " + req.body.topic });
       })
       .catch(err => {
-        console.error("api error", err);
+        logger.error("api recordrf error", err);
         res.statusCode = 500;
         return res.json({
           errors: ["Failed " + err],
@@ -296,6 +316,18 @@ router.delete("/files", function(req, res) {
       });
     });
 });
+router.get("/devices", function(req, res) {
+  getDevicesInfo().then(devs=>{
+    res.json(devs);
+  })
+  .catch(err => {
+    res.statusCode = 400;
+        return res.json({
+          errors: ["Error occured"],
+          err
+        });
+  });
+});
 
 app.use("/api", router);
 
@@ -307,7 +339,9 @@ let actionIsRunning = false;
 
 function runAction(action, topic, origin) {
   action = action.toLowerCase();
-  switch (action) {
+  let actionMode = action;
+  if(actionMode.indexOf(':')!==-1) actionMode = action.substring(0,action.indexOf(':'));
+  switch (actionMode) {
     case "recordir":
       return prepareAction({ action, topic, origin })
         .then(deviceEnterLearningIR)
@@ -369,10 +403,35 @@ const prepareAction = data =>
       );
       const filePath = path.join(commandsPath, actionPath) + ".bin";
       const folderPath = filePath.substr(0, filePath.lastIndexOf("/"));
+
+      // find device to use
+      let device;
+      if(devices.length===0){
+        return reject('No devices');
+      }
+      else if(data.action.indexOf(':')!==-1){
+        // we want to select specific device 
+        const deviceId = data.action.substring(data.action.indexOf(':')+1);
+        for(let i = 0; i < devices.length; i++){
+          if(devices[i].host.id===deviceId){
+            device = devices[i];
+            break;
+          }
+        }
+        if(!device) return reject('Requested device not found');
+      }
+      else if(devices.length>1){
+        return reject('Multiple devices exists. Please specify one to use.');
+      }
+      else{
+        device = devices[0];
+      }
+
       data = Object.assign({}, data, {
         path: actionPath,
         folderPath,
-        filePath
+        filePath,
+        device
       });
       resolve(data);
     } else {
@@ -385,7 +444,7 @@ const prepareAction = data =>
 const deviceEnterLearningIR = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceEnterLearningIR");
-    device.enterLearning();
+    data.device.enterLearning();
     resolve(data);
   });
 
@@ -393,7 +452,7 @@ const deviceEnterLearningIR = data =>
 const deviceExitLearningIR = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceExitLearningIR");
-    device.cancelLearn();
+    data.device.cancelLearn();
     resolve(data);
   });
 
@@ -401,21 +460,21 @@ const deviceExitLearningIR = data =>
 const deviceEnterLearningRFSweep = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceEnterLearningRFSweep");
-    device.enterRFSweep();
+    data.device.enterRFSweep();
     resolve(data);
   });
 // enter rf learning
 const deviceEnterLearningRF = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceEnterLearningRF");
-    device.enterLearning();
+    data.device.enterLearning();
     resolve(data);
   });
 // stops rf
 const deviceExitLearningRF = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceExitLearningRF");
-    device.cancelLearn();
+    data.device.cancelLearn();
     resolve(data);
   });
 
@@ -444,7 +503,7 @@ const recordIR = data =>
     let intervalSpeed = 1;
     let interval = setInterval(() => {
       logger.info("recordIR: Timeout in " + timeout);
-      device.checkData();
+      data.device.checkData();
       timeout -= intervalSpeed;
       if (timeout <= 0) {
         clearInterval(interval);
@@ -457,11 +516,11 @@ const recordIR = data =>
     const callback = dataRaw => {
       clearInterval(interval);
       logger.debug("Broadlink IR RAW");
-      device.emitter.off("rawData", callback);
+      data.device.emitter.off("rawData", callback);
       data.signal = dataRaw;
       resolve(data);
     };
-    device.on("rawData", callback);
+    data.device.on("rawData", callback);
   });
 
 // Record RF Signal (after a frequence is found)
@@ -473,7 +532,7 @@ const recordRFCode = data =>
       let intervalSpeed = 1;
       let interval = setInterval(() => {
         logger.info("recordRFCode: Timeout in " + timeout);
-        device.checkData();
+        data.device.checkData();
         timeout -= intervalSpeed;
         if (timeout <= 0) {
           clearInterval(interval);
@@ -487,10 +546,10 @@ const recordRFCode = data =>
         logger.debug("Broadlink RF RAW");
         data.signal = dataRaw;
         clearInterval(interval);
-        device.emitter.off("rawData", callback);
+        data.device.emitter.off("rawData", callback);
         resolve(data);
       };
-      device.on("rawData", callback);
+      data.device.on("rawData", callback);
     }, 3000);
   });
 
@@ -502,7 +561,7 @@ const recordRFFrequence = data =>
     let intervalSpeed = 1;
     let interval = setInterval(() => {
       logger.info("recordRFFrequence: Timeout in " + timeout);
-      device.checkRFData();
+      data.device.checkRFData();
       timeout -= intervalSpeed;
       if (timeout <= 0) {
         clearInterval(interval);
@@ -514,11 +573,11 @@ const recordRFFrequence = data =>
     // RF Sweep found something
     const callback = dataRaw => {
       clearInterval(interval);
-      device.emitter.off("rawRFData", callback);
+      data.device.emitter.off("rawRFData", callback);
       data.frq = dataRaw;
       resolve(data);
     };
-    device.on("rawRFData", callback);
+    data.device.on("rawRFData", callback);
   });
 
 const playAction = data =>
@@ -530,7 +589,7 @@ const playAction = data =>
         reject("Stopped at playAction");
         return;
       } else {
-        device.sendData(fileData, false);
+        data.device.sendData(fileData, false);
         resolve(data);
       }
     });
@@ -654,3 +713,13 @@ const listFilestructure = dir => {
 
   return walk(dir);
 };
+
+const getDevicesInfo = () =>
+  new Promise((resolve, reject) => {
+    var devs = [];
+    for(let i = 0; i < devices.length; i++){
+      devs.push(Object.assign({},devices[i].host));
+    }
+    resolve(devs);
+  });
+

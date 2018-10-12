@@ -53,15 +53,22 @@
                             placeholder="Enter Topic">
                     </div>
 
+                    <div class="form-group ">
+                        <input type="input" class="form-control" id="inputDeviceId" aria-describedby="deviceHelp"
+                            placeholder="Enter Device ID">
+                            <small id="deviceHelp" class="form-text text-muted" style="padding-bottom: 20px;">If multiple devices set the id</small>
+
+                    </div>
+
                     <button type="submit" class="btn btn-primary" id="recordIR">Record IR</button>
                     <button type="submit" class="btn btn-primary" id="recordRF">Record RF</button>
                     <button type="submit" class="btn btn-info" id="play">Play</button>
                     <button type="button" class="btn btn-info" id="list">List actions</button>
-
+                    <button type="button" class="btn btn-info" id="devices">List devices</button>
                 </form>
             </div>
             <div class="col-md-6">
-                <h4>Actions <span><button type="button" id="btnDelete" class="btn btn-danger btn-sm" disabled>Delete</button></span></h4>
+                <h4>Actions <span><button type="button" id="btnDelete" class="btn btn-danger btn-sm" disabled>Delete</button><button type="button" id="btnRefreshFiles" class="btn btn-primary btn-sm">Refresh</button></span></h4>
                 <div id="jstree"></div>
             </div>
         </div>
@@ -125,6 +132,12 @@
             $("#list").click(function () {
                 socket.emit('getActions');
             });
+            $("#devices").click(function () {
+                socket.emit('getDevices');
+            });
+            $("#btnRefreshFiles").click(function () {
+                loadTreeData();
+            });
             $("#btnDelete").click(function () {
                 if (!selectedNode) {
                     alert("Please select a file in the tree");
@@ -152,6 +165,10 @@
                     return;
                 }
                 var action = $("#formPublish button[type=submit][clicked=true]").attr('id').toLowerCase();
+                var actionDeviceId = $("#inputDeviceId").val();
+                if(actionDeviceId!==""){
+                    action += ':'+actionDeviceId;
+                }
                 var topic = config.mqtt.subscribeBasePath + '/' + $("#inputTopic").val();
                 socket.emit('action', { action, topic });
             });
@@ -198,6 +215,8 @@
                 $.ajax({
                     url: '/api/files',
                     success: function (data) {
+                        hashList = [];
+                        hashDuplicates = [];
                         deepLookForDuplicates(data);
                         data.state = { opened: true };
                         $('#jstree').jstree(true).settings.core.data = data;
@@ -235,6 +254,7 @@
                 if (data.node && data.node.type === "file") {
                     let p = data.node.original.path;
                     p = p.substr(p.indexOf("/") + 1);
+                    p = p.substring(p,p.lastIndexOf('.'));
                     $("#inputTopic").val(p);
                     $("#btnDelete").attr("disabled", false);
                     selectedNode = data.node.original;

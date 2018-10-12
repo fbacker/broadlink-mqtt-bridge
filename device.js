@@ -33,12 +33,14 @@ discoverDevices();
 broadlink.on("deviceReady", device => {
   const macAddressParts =
     device.mac.toString("hex").match(/[\s\S]{1,2}/g) || [];
+  //const ipAddressParts = device.host.address.split('.');
   const macAddress = macAddressParts.join(":");
   device.host.macAddress = macAddress;
+  const ipAddress = device.host.address;
 
   if (
-    discoveredDevices[device.host.address] ||
-    discoveredDevices[device.host.macAddress]
+    discoveredDevices[ipAddress] ||
+    discoveredDevices[macAddress]
   )
     return;
   /*
@@ -48,8 +50,12 @@ broadlink.on("deviceReady", device => {
       })`
     );
   */
-  discoveredDevices[device.host.address] = device;
-  discoveredDevices[device.host.macAddress] = device;
+ 
+ 
+  //device.host.id = macAddressParts.join('').substring(0,4) + ipAddressParts.slice(2).join('');
+  device.host.id = macAddressParts.join('');
+  discoveredDevices[ipAddress] = device;
+  discoveredDevices[macAddress] = device;
   myEmitter.emit("device", device);
 });
 

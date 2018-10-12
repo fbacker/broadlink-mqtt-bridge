@@ -69,6 +69,9 @@ Most output and simple is running the web gui. This will output everything from 
 
 http://localhost:3000/
 
+**Multiple devices**
+You need to specify the broadlink id in the form input field. You can list connected devices with the 'devices' button.
+
 ## WebSocket
 
 Could be good for something right?
@@ -92,6 +95,10 @@ Look at ./html/index.html for example. You can call actions and listen to logs.
             // all saved actions, trigged with
             // socket.emit('getActions');
         });
+        socket.on('devices', function(devices) {
+            // all connected devices, triggered with
+            // socket.emit('getDevices');
+        })
 
         /***
          * action
@@ -103,12 +110,20 @@ Look at ./html/index.html for example. You can call actions and listen to logs.
          */
         socket.emit('action', { action, topic });
 
+        **Multiple Devices**
+        If using multiple broadlink devices you need to add the id of the device you want to use.
+        Use with play:{id}, e.g. play:ds9323d
+        Available devices is found with socket.emit('getDevices'); and listening to socket.on('devices', function(devices) =>
     </script>
 ```
 
 ## Rest API
 
 It's possible to use api to calls for play and recording actions. Note that recording wont give help information as when using the web api.
+
+**Multiple devices**
+If using multiple broadlink devices, you need to specify the unique id with the post. Add it with {"id":"myid}.
+The ID is found in the webconsole or with /api/devices
 
 ```js
 // Play a recorded action
@@ -129,10 +144,20 @@ curl --header "Content-Type: application/json" \
   --data '{"topic":"broadlink/fan/light"}' \
   http://localhost:3000/api/recordRF
 
-// JSON Tree of files
+// Tree of files
 curl --header "Content-Type: application/json" \
   --request GET \
   http://localhost:3000/api/files
+
+curl --header "Content-Type: application/json" \
+  --request DELETE \
+  --data '{"file":"commands/fan/light"}' \
+  http://localhost:3000/api/files
+
+// List connected devices
+curl --header "Content-Type: application/json" \
+  --request GET \
+  http://localhost:3000/api/devices
 ```
 
 ## MQTT (best for playing)
@@ -157,6 +182,8 @@ Look at OpenHab documentation how to configure openhab with MQTT https://www.ope
 
 // .items
 Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play]"}
+// or specific broadlink device
+Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play:23fdsd]"}
 
 // .sitemap
 Frame label="Fan Livingroom"  {
@@ -190,3 +217,4 @@ Selection item=FanSpeed mappings=[1="1", 2="2", 3="3", 4="4", 5="5", 6="6"]
 - [ ] Cleanup project
 - [ ] Make GUI pretty
 - [ ] OpenHAB RPI AutoInstall Script
+- [x] Multiple broadlink devices
