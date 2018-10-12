@@ -19,7 +19,7 @@ scriptId=$sourceDir/$scriptfile
 
 
 start() {
-    echo "Starting $scriptId"
+    echo "Starting $scriptId\n"
 
     # Start our CoffeeScript app through forever
     # Notice that we change the PATH because on reboot
@@ -34,19 +34,19 @@ start() {
 }
 
 restart() {
-    echo -n "Restarting $scriptId"
+    echo -n "Restarting $scriptId\n"
     /usr/bin/forever restart $scriptId
     RETVAL=$?
 }
 
 stop() {
-    echo -n "Shutting down $scriptId"
+    echo -n "Shutting down $scriptId\n"
     /usr/bin/forever stop $scriptId
     RETVAL=$?
 }
 
 status() {
-    echo -n "Status $scriptId"
+    echo -n "Status $scriptId\n"
     /usr/bin/forever list
     RETVAL=$?
 }
