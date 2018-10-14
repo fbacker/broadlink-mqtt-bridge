@@ -516,7 +516,7 @@ const recordIR = data =>
     const callback = dataRaw => {
       clearInterval(interval);
       logger.debug("Broadlink IR RAW");
-      data.device.emitter.off("rawData", callback);
+      data.device.removeListener("rawData", callback);
       data.signal = dataRaw;
       resolve(data);
     };
@@ -546,7 +546,7 @@ const recordRFCode = data =>
         logger.debug("Broadlink RF RAW");
         data.signal = dataRaw;
         clearInterval(interval);
-        data.device.emitter.off("rawData", callback);
+        data.device.removeListener("rawData", callback);
         resolve(data);
       };
       data.device.on("rawData", callback);
