@@ -183,8 +183,8 @@ io.on("connection", socket => {
   socket.on("action", msg => {
     logger.info("Web User want action", msg);
     runAction(msg.action, msg.topic, "web")
-      .then(data => console.log("web done", data))
-      .catch(err => console.error("web failed", err));
+      .then(data => logger.log("web done", data))
+      .catch(err => logger.error("web failed", err));
   });
   socket.on("getActions", () => {
     logger.info("Loading saved actions");
