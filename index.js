@@ -133,7 +133,7 @@ broadlink.on("device", discoveredDevice => {
   devices.push(discoveredDevice);
   logger.info("Broadlink Found Device", discoveredDevice.host);
   discoveredDevice.on("temperature", temperature =>
-    logger.debug(`Broadlink Temperature ${temperature}`,discoveredDevice.host)
+    logger.debug(`Broadlink Temperature ${temperature}`, discoveredDevice.host)
   );
   /*
   // IR or RF signal found
@@ -174,19 +174,19 @@ server.listen(cfg.gui.port, () =>
 
 // websocket actions
 io = socket.listen(server);
-io.on("connection", (socket)=> {
+io.on("connection", socket => {
   logger.info("Web a client connected");
   io.emit("config", cfg);
-  socket.on("disconnect", ()=> {
+  socket.on("disconnect", () => {
     logger.info("Web a client disconnected");
   });
-  socket.on("action", (msg)=> {
+  socket.on("action", msg => {
     logger.info("Web User want action", msg);
     runAction(msg.action, msg.topic, "web")
       .then(data => console.log("web done", data))
       .catch(err => console.error("web failed", err));
   });
-  socket.on("getActions", ()=> {
+  socket.on("getActions", () => {
     logger.info("Loading saved actions");
     handleListAllActions()
       .then(files => {
@@ -195,14 +195,15 @@ io.on("connection", (socket)=> {
       })
       .catch(err => logger.error("Failed to load " + err));
   });
-  socket.on('getDevices', ()=>{
+  socket.on("getDevices", () => {
     logger.info("Loading Connected devices");
-    getDevicesInfo().then(devs=>{
-      logger.info("Connected devices", devs);
-      io.emit("devices", devs);
-    })
-    .catch(err => logger.error("Failed to load " + err));
-  })
+    getDevicesInfo()
+      .then(devs => {
+        logger.info("Connected devices", devs);
+        io.emit("devices", devs);
+      })
+      .catch(err => logger.error("Failed to load " + err));
+  });
 });
 
 // API
@@ -210,8 +211,8 @@ var router = express.Router();
 router.post("/play", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
     let action = "play";
-    if(req.body.id){
-      action += ':'+req.body.id;
+    if (req.body.id) {
+      action += ":" + req.body.id;
     }
     runAction(action, req.body.topic, "api")
       .then(() => {
@@ -236,8 +237,8 @@ router.post("/play", function(req, res) {
 router.post("/recordir", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
     let action = "recordir";
-    if(req.body.id){
-      action += ':'+req.body.id;
+    if (req.body.id) {
+      action += ":" + req.body.id;
     }
     runAction(action, req.body.topic, "api")
       .then(data => {
@@ -262,8 +263,8 @@ router.post("/recordir", function(req, res) {
 router.post("/recordrf", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
     let action = "recordrf";
-    if(req.body.id){
-      action += ':'+req.body.id;
+    if (req.body.id) {
+      action += ":" + req.body.id;
     }
     runAction(action, req.body.topic, "api")
       .then(data => {
@@ -317,16 +318,17 @@ router.delete("/files", function(req, res) {
     });
 });
 router.get("/devices", function(req, res) {
-  getDevicesInfo().then(devs=>{
-    res.json(devs);
-  })
-  .catch(err => {
-    res.statusCode = 400;
-        return res.json({
-          errors: ["Error occured"],
-          err
-        });
-  });
+  getDevicesInfo()
+    .then(devs => {
+      res.json(devs);
+    })
+    .catch(err => {
+      res.statusCode = 400;
+      return res.json({
+        errors: ["Error occured"],
+        err
+      });
+    });
 });
 
 app.use("/api", router);
@@ -340,7 +342,8 @@ let actionIsRunning = false;
 function runAction(action, topic, origin) {
   action = action.toLowerCase();
   let actionMode = action;
-  if(actionMode.indexOf(':')!==-1) actionMode = action.substring(0,action.indexOf(':'));
+  if (actionMode.indexOf(":") !== -1)
+    actionMode = action.substring(0, action.indexOf(":"));
   switch (actionMode) {
     case "recordir":
       return prepareAction({ action, topic, origin })
@@ -406,24 +409,21 @@ const prepareAction = data =>
 
       // find device to use
       let device;
-      if(devices.length===0){
-        return reject('No devices');
-      }
-      else if(data.action.indexOf(':')!==-1){
-        // we want to select specific device 
-        const deviceId = data.action.substring(data.action.indexOf(':')+1);
-        for(let i = 0; i < devices.length; i++){
-          if(devices[i].host.id===deviceId){
+      if (devices.length === 0) {
+        return reject("No devices");
+      } else if (data.action.indexOf(":") !== -1) {
+        // we want to select specific device
+        const deviceId = data.action.substring(data.action.indexOf(":") + 1);
+        for (let i = 0; i < devices.length; i++) {
+          if (devices[i].host.id === deviceId) {
             device = devices[i];
             break;
           }
         }
-        if(!device) return reject('Requested device not found');
-      }
-      else if(devices.length>1){
-        return reject('Multiple devices exists. Please specify one to use.');
-      }
-      else{
+        if (!device) return reject("Requested device not found");
+      } else if (devices.length > 1) {
+        return reject("Multiple devices exists. Please specify one to use.");
+      } else {
         device = devices[0];
       }
 
@@ -452,7 +452,7 @@ const deviceEnterLearningIR = data =>
 const deviceExitLearningIR = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceExitLearningIR");
-    data.device.cancelLearn();
+    if (data.device) data.device.cancelLearn();
     resolve(data);
   });
 
@@ -717,9 +717,8 @@ const listFilestructure = dir => {
 const getDevicesInfo = () =>
   new Promise((resolve, reject) => {
     var devs = [];
-    for(let i = 0; i < devices.length; i++){
-      devs.push(Object.assign({},devices[i].host));
+    for (let i = 0; i < devices.length; i++) {
+      devs.push(Object.assign({}, devices[i].host));
     }
     resolve(devs);
   });
-

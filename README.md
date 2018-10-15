@@ -7,19 +7,20 @@ You will be able with the filetree see all recorded actions, delete actions and 
 
 ![admin gui](https://github.com/fbacker/broadlink-mqtt-bridge/raw/master/github/overview1.png)
 
-### Requirements
+## Requirements
 
 - node
 - mqtt
 - a broadlink device e.g. RM 3 PRO
 
-# Starting
+## Starting
 
 There is a couple of options.
 
-## Raspberry PI AutoInstaller
+### Raspberry PI AutoInstaller
 
 SSH into your RPI then run the command
+
 ```js
 bash -c "$(curl -sL https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bridge/master/installers/raspberry.sh)"
 ```
@@ -29,13 +30,14 @@ This will install the broadlink-mqtt-bridge project in /srv/openhab2-conf/broadl
 It's possible to run manually
 
 **NOTE:** Still error in install script so it wont start after reboot. Needs to be started manually.
-```
-/etc/init.d/broadlinkbridge start|stop|status 
+
+```js
+/etc/init.d/broadlinkbridge start|stop|status
 ```
 
-To upgrade to latest version just run the script again or run ```git pull``` in the app directory.
+To upgrade to latest version just run the script again or run `git pull` in the app directory.
 
-## Manually
+### Manually
 
 ```js
 // install
@@ -50,23 +52,21 @@ node index.js
 // example for linux (e.g. openhab2 on RPI)
 crontab -e
 @reboot cd /home/openhabian/broadlink-mqtt-bridge && node index.js < /dev/null &
+
+// To upgrade to latest version
+git pull
 ```
 
-## Docker
+## Configure
 
-This is on the works
+in ./config there's a couple of options in default.json. Do not change this. This is the default settings that can be overwritten.
+Make your own file `./config/local.json` and only add and change values that you want. This will solve issues with upgrades.
 
-# Configure
-
-in ./config there's a couple of options in default.json. Do not change this. This is the default settings that can be changed.
-Make your own file ./config/local.json and only add and change values that you want. This will solve issues with upgrades.
-
-
-# Running
+## Running
 
 There's a couple of ways to interact. Web GUI, Websockets, Rest API and with MQTT.
 
-## Web (best for Recording)
+### Web (best for Recording)
 
 Most output and simple is running the web gui. This will output everything from logs and GUI to trigger actions. Possible to change port in config.
 
@@ -75,7 +75,7 @@ http://localhost:3000/
 **Multiple devices**
 You need to specify the broadlink id in the form input field. You can list connected devices with the 'devices' button.
 
-## WebSocket
+### WebSocket
 
 Could be good for something right?
 
@@ -120,7 +120,7 @@ Look at ./html/index.html for example. You can call actions and listen to logs.
     </script>
 ```
 
-## Rest API
+### Rest API
 
 It's possible to use api to calls for play and recording actions. Note that recording wont give help information as when using the web api.
 
@@ -163,7 +163,7 @@ curl --header "Content-Type: application/json" \
   http://localhost:3000/api/devices
 ```
 
-## MQTT (best for playing)
+### MQTT (best for playing)
 
 Send play, recordir or recordrf to a topic.
 
@@ -173,7 +173,15 @@ Topic: broadlink / fan / light;
 Message: play;
 ```
 
-# OpenHAB
+If using multiple device add the device id in the message.
+
+```js
+// Play action on specific device
+Topic: broadlink / fan / light;
+Message: play: bdh3hi;
+```
+
+## OpenHAB
 
 After recorded a couple of actions it's possible to use with OpenHAB. Use same MQTT server in config settings.
 
@@ -213,11 +221,3 @@ end
 // .sitemap
 Selection item=FanSpeed mappings=[1="1", 2="2", 3="3", 4="4", 5="5", 6="6"]
 ```
-
-# TODOs
-
-- [ ] Create Docker
-- [ ] Cleanup project
-- [ ] Make GUI pretty
-- [x] OpenHAB RPI AutoInstall Script
-- [x] Multiple broadlink devices
