@@ -56,7 +56,8 @@
                     <div class="form-group ">
                         <input type="input" class="form-control" id="inputDeviceId" aria-describedby="deviceHelp"
                             placeholder="Enter Device ID">
-                            <small id="deviceHelp" class="form-text text-muted" style="padding-bottom: 20px;">If multiple devices set the id</small>
+                        <small id="deviceHelp" class="form-text text-muted" style="padding-bottom: 20px;">If multiple
+                            devices set the id</small>
 
                     </div>
 
@@ -68,7 +69,8 @@
                 </form>
             </div>
             <div class="col-md-6">
-                <h4>Actions <span><button type="button" id="btnDelete" class="btn btn-danger btn-sm" disabled>Delete</button><button type="button" id="btnRefreshFiles" class="btn btn-primary btn-sm">Refresh</button></span></h4>
+                <h4>Actions <span><button type="button" id="btnDelete" class="btn btn-danger btn-sm" disabled>Delete</button><button
+                            type="button" id="btnRefreshFiles" class="btn btn-primary btn-sm">Refresh</button></span></h4>
                 <div id="jstree"></div>
             </div>
         </div>
@@ -96,10 +98,8 @@
             var socket = io();
             var selectedNode = null;
 
-            socket.on('connection', function (socket) {
-                // connected
-            });
-            socket.on('log', function (msg) {
+            const log = function (msg) {
+                console.log('msg from server', msg);
                 // nice colors
                 var color = msg.level;
                 if (color === "error") color = "warning";
@@ -117,13 +117,19 @@
 
                 var obj = `<li class=\"list-group-item bg-${color}\">${msg.message} ${obj}</li>`;
                 $("#logs").prepend(obj);
+            }
+
+            socket.on('connection', function (socket) {
+                // connected
+            });
+            socket.on('log', function (msg) {
+                log(msg);
             });
             socket.on('config', function (msg) {
                 config = msg;
                 console.log('config', msg)
                 $("#configMQTT").text(`${config.mqtt.subscribeBasePath}/`);
-                var obj = `<li class=\"list-group-item bg-success\">Config is loaded</li>`;
-                $("#logs").prepend(obj);
+                log({ level: 'info', message: 'Config is loaded', config });
             });
             socket.on('actions', function (msg) {
                 console.log('actions that can be played', msg)
@@ -166,8 +172,8 @@
                 }
                 var action = $("#formPublish button[type=submit][clicked=true]").attr('id').toLowerCase();
                 var actionDeviceId = $("#inputDeviceId").val();
-                if(actionDeviceId!==""){
-                    action += ':'+actionDeviceId;
+                if (actionDeviceId !== "") {
+                    action += ':' + actionDeviceId;
                 }
                 var topic = config.mqtt.subscribeBasePath + '/' + $("#inputTopic").val();
                 socket.emit('action', { action, topic });
@@ -254,7 +260,7 @@
                 if (data.node && data.node.type === "file") {
                     let p = data.node.original.path;
                     p = p.substr(p.indexOf("/") + 1);
-                    p = p.substring(p,p.lastIndexOf('.'));
+                    p = p.substring(p, p.lastIndexOf('.'));
                     $("#inputTopic").val(p);
                     $("#btnDelete").attr("disabled", false);
                     selectedNode = data.node.original;
