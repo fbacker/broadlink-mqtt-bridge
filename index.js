@@ -356,7 +356,7 @@ function runAction(action, topic, origin) {
         })
         .catch(err => {
           console.log("error occured", err);
-          deviceExitLearningIR();
+          prepareAction({ action, topic, origin }).then(deviceExitLearningIR);
         });
       break;
     case "recordrf":
@@ -372,7 +372,7 @@ function runAction(action, topic, origin) {
         })
         .catch(err => {
           console.log("error occured", err);
-          deviceExitLearningRF();
+          prepareAction({ action, topic, origin }).then(deviceExitLearningRF);
         });
       break;
     case "play":
@@ -452,7 +452,7 @@ const deviceEnterLearningIR = data =>
 const deviceExitLearningIR = data =>
   new Promise((resolve, reject) => {
     logger.debug("deviceExitLearningIR");
-    if (data.device) data.device.cancelLearn();
+    data.device.cancelLearn();
     resolve(data);
   });
 
