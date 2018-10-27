@@ -1,7 +1,7 @@
 #!/bin/bash
 
-pidFile=/var/run/forever-broadlinkbridge.pid 
-logFile=/var/log/broadlinkbridge/output.log 
+pidFile=/var/run/forever-broadlinkbridge.pid
+logFile=/var/log/broadlinkbridge/output.log
 
 sourceDir=/srv/openhab2-conf/broadlink-mqtt-bridge
 scriptfile=index.js
