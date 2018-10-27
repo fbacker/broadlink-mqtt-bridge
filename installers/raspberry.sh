@@ -109,7 +109,7 @@ read -p "Do you want use auto starting on RPI Reboot (y/N)?" choice
 if [[ $choice =~ ^[Yy]$ ]]; then
     sudo npm install -g forever
     sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/boot.sh /etc/init.d/broadlinkbridge
-    sudo chmod 755 /etc/init.d/broadlinkbridge
+    sudo chmod +x /etc/init.d/broadlinkbridge
 	sudo update-rc.d broadlinkbridge defaults
     echo -e "\e[92mAll is configured, Please reboot.\e[0m"
 else 

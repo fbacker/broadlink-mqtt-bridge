@@ -1,17 +1,7 @@
 #!/bin/bash
-#
-# initd-example      Node init.d 
-#
-# chkconfig: 345 
-# description: Script to start 
-# processname: forever/coffeescript/node
-# pidfile: /var/run/forever-broadlinkbridge.pid 
-# logfile: /var/run/forever-broadlinkbridge.log
-#
-
 
 pidFile=/var/run/forever-broadlinkbridge.pid 
-logFile=/var/run/forever-broadlinkbridge.log 
+logFile=/var/log/broadlinkbridge/output.log 
 
 sourceDir=/srv/openhab2-conf/broadlink-mqtt-bridge
 scriptfile=index.js
@@ -21,11 +11,6 @@ scriptId=$sourceDir/$scriptfile
 start() {
     echo "Starting $scriptId\n"
 
-    # Start our CoffeeScript app through forever
-    # Notice that we change the PATH because on reboot
-    # the PATH does not include the path to node.
-    # Launching forever or coffee with a full path
-    # does not work unless we set the PATH.
     cd $sourceDir
     PATH=/usr/local/bin:$PATH
     NODE_ENV=production forever start --pidFile $pidFile -l $logFile -a -d --sourceDir $sourceDir/ -c /usr/bin/node $scriptfile
