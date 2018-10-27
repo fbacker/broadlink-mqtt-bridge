@@ -79,6 +79,10 @@ if [ -d "./broadlink-mqtt-bridge" ] ; then
     echo -e "\e[96mUpgrade ...\e[90m"
     if git pull; then 
         echo -e "\e[92mUpgrade Done!\e[0m"
+		sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/boot.sh /etc/init.d/broadlinkbridge
+    	sudo chmod +x /etc/init.d/broadlinkbridge
+		sudo /etc/init.d/broadlinkbridge restart
+		echo -e "\e[92mService rebooted and ready!\e[0m"
     else
         echo -e "\e[91mUnable to upgrade."
         echo -e "\e[91mPlease run git pull manually."
