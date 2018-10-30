@@ -79,9 +79,11 @@ if [ -d "./broadlink-mqtt-bridge" ] ; then
     echo -e "\e[96mUpgrade ...\e[90m"
     if git pull; then 
         echo -e "\e[92mUpgrade Done!\e[0m"
-		sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/boot.sh /etc/init.d/broadlinkbridge
-    	sudo chmod +x /etc/init.d/broadlinkbridge
-		sudo /etc/init.d/broadlinkbridge restart
+		npm install
+		sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
+		sudo chmod +x /etc/systemd/system/broadlinkbridge.service
+		sudo systemctl daemon-reload
+		sudo systemctl restart broadlinkbridge.service
 		echo -e "\e[92mService rebooted and ready!\e[0m"
     else
         echo -e "\e[91mUnable to upgrade."
@@ -112,10 +114,10 @@ fi
 read -p "Do you want use auto starting on RPI Reboot (y/N)?" choice
 if [[ $choice =~ ^[Yy]$ ]]; then
 	sudo mkdir /var/log/broadlinkbridge
-    sudo npm install -g forever
-    sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/boot.sh /etc/init.d/broadlinkbridge
-    sudo chmod +x /etc/init.d/broadlinkbridge
-	sudo update-rc.d broadlinkbridge defaults
+	sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
+	sudo chmod +x /etc/systemd/system/broadlinkbridge.service
+	sudo systemctl enable broadlinkbridge.service
+	sudo systemctl start broadlinkbridge.service
     echo -e "\e[92mAll is configured, Please reboot.\e[0m"
 else 
     echo -e "\e[92mInstallation is complete.\e[0m"
