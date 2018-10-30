@@ -199,17 +199,18 @@ After recorded a couple of actions it's possible to use with OpenHAB. Use same M
 Look at OpenHab documentation how to configure openhab with MQTT https://www.openhab.org/addons/bindings/mqtt1/
 
 ```js
-/// EXAMPLE SIMPLE ACTION
-// Swap light, 1 recorded action
+/// EXAMPLE ON/OFF device
+Switch OutdoorLight1 "Outdoor Porch" {mqtt=">[mqtt:broadlink/switches/outdoor/garden1/on:command:ON:play],>[mqtt:broadlink/switches/outdoor/garden1/off:command:OFF:play]"}
 
-// .items
+// EXAMPLE Swap light
 Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play]"}
 // or specific broadlink device
 Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play:23fdsd]"}
 
 // .sitemap
 Frame label="Fan Livingroom"  {
-    Switch item=FanLights label="Lampor" mappings=[ON="Swap"]
+    Switch item=OutdoorLight1 label="Outdoor"
+    Switch item=FanLights label="Swap light" mappings=[ON="Swap"]
 }
 
 /// EXAMPLE ADVANCED
