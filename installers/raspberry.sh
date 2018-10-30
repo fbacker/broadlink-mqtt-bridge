@@ -117,7 +117,7 @@ if [[ $choice =~ ^[Yy]$ ]]; then
 	sudo chmod +x /etc/systemd/system/broadlinkbridge.service
 	sudo systemctl enable broadlinkbridge.service
 	sudo systemctl start broadlinkbridge.service
-    echo -e "\e[92mAll is configured, Please reboot.\e[0m"
+    echo -e "\e[92mAll is configured.\e[0m"
 else 
     echo -e "\e[92mInstallation is complete.\e[0m"
 fi
