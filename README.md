@@ -1,21 +1,20 @@
 # MQTT - Broadlink
 
-Yet another MQTT - Broadlink Bridge for helping OpenHAB.
-This tool helps you to record and play Broadlink actions via MQTT or Admin GUI.
+Yet another MQTT - Broadlink Bridge.
 
-You will be able with the filetree see all recorded actions, delete actions and if a disclamation mark occures, this means that the action is a duplicate of another.
+This one is built specifically with OpenHAB on a Raspberry PI in mind. However it can be used in other scenarios installation outside RPI.
+
+It has a Admin GUI for helping record IR / RF signals. You will be able with the filetree see all recorded actions, delete actions and if a disclamation mark occures, this means that the action is a duplicate of another (has same binary content).
 
 ![admin gui](https://github.com/fbacker/broadlink-mqtt-bridge/raw/master/github/overview1.png)
 
 ## Requirements
 
-- node
-- mqtt
-- a broadlink device e.g. RM 3 PRO
+- Node > 8 (installed on RPI OpenHAB)
+- MQTT (mosquitto in OpenHAB)
+- Broadlink device e.g. RM 3 PRO
 
-## Starting
-
-There is a couple of options.
+## Installation
 
 ### Raspberry PI AutoInstaller
 
@@ -27,20 +26,13 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bri
 
 This will install the broadlink-mqtt-bridge project in /srv/openhab2-conf/broadlink-mqtt-bridge/. At the end of the installer you will have an option to make the project run automatic at boot.
 
-It's possible to run manually
-
-**NOTE:** Still error in install script so it wont start after reboot. Needs to be started manually.
-
-```js
-/etc/init.d/broadlinkbridge start|stop|status
-```
-
 To upgrade to latest version just run the script again or run `git pull` in the app directory.
 
 ### Manually
 
 ```js
 // install
+cd /home/openhabian/
 git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
 cd broadlink-mqtt-bridge
 npm install
@@ -60,7 +52,9 @@ git pull
 ## Configure
 
 in ./config there's a couple of options in default.json. Do not change this. This is the default settings that can be overwritten.
-Make your own file `./config/local.json` and only add and change values that you want. This will solve issues with upgrades.
+Make your own file `./config/local.json` and only add and change values that you want.
+
+**NOTE:** Changing the default.json will break updates.
 
 ## Running
 
@@ -70,10 +64,71 @@ There's a couple of ways to interact. Web GUI, Websockets, Rest API and with MQT
 
 Most output and simple is running the web gui. This will output everything from logs and GUI to trigger actions. Possible to change port in config.
 
-http://localhost:3000/
+`http://{computer-ip}:3000/`
 
 **Multiple devices**
 You need to specify the broadlink id in the form input field. You can list connected devices with the 'devices' button.
+
+### MQTT (best for playing)
+
+Send play, recordir or recordrf to a topic.
+
+```js
+// Example play an action
+Topic: broadlink / fan / light;
+Message: play;
+```
+
+If using multiple device add the device id in the message.
+
+```js
+// Play action on specific broadlink device
+Topic: broadlink / fan / light;
+Message: play: bdh3hi;
+```
+
+### Rest API
+
+It's possible to use api to calls for play and recording actions. Note that recording wont give help information as when using the web api.
+
+**Multiple devices**
+If using multiple broadlink devices, you need to specify the unique id with the post. Add it with {"id":"myid}.
+The ID is found in the webconsole or with /api/devices
+
+```js
+// Play a recorded action
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"topic":"broadlink/tv/samsung/power"}' \
+  http://localhost:3000/api/play
+
+// Record IR device
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"topic":"broadlink/tv/samsung/power"}' \
+  http://localhost:3000/api/recordIR
+
+// Record RF device
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"topic":"broadlink/fan/light"}' \
+  http://localhost:3000/api/recordRF
+
+// Tree of files
+curl --header "Content-Type: application/json" \
+  --request GET \
+  http://localhost:3000/api/files
+
+curl --header "Content-Type: application/json" \
+  --request DELETE \
+  --data '{"file":"commands/fan/light"}' \
+  http://localhost:3000/api/files
+
+// List connected devices
+curl --header "Content-Type: application/json" \
+  --request GET \
+  http://localhost:3000/api/devices
+```
 
 ### WebSocket
 
@@ -120,67 +175,6 @@ Look at ./html/index.html for example. You can call actions and listen to logs.
     </script>
 ```
 
-### Rest API
-
-It's possible to use api to calls for play and recording actions. Note that recording wont give help information as when using the web api.
-
-**Multiple devices**
-If using multiple broadlink devices, you need to specify the unique id with the post. Add it with {"id":"myid}.
-The ID is found in the webconsole or with /api/devices
-
-```js
-// Play a recorded action
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"topic":"broadlink/tv/samsung/power"}' \
-  http://localhost:3000/api/play
-
-// Record IR device
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"topic":"broadlink/tv/samsung/power"}' \
-  http://localhost:3000/api/recordIR
-
-// Record RF device
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"topic":"broadlink/fan/light"}' \
-  http://localhost:3000/api/recordRF
-
-// Tree of files
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:3000/api/files
-
-curl --header "Content-Type: application/json" \
-  --request DELETE \
-  --data '{"file":"commands/fan/light"}' \
-  http://localhost:3000/api/files
-
-// List connected devices
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:3000/api/devices
-```
-
-### MQTT (best for playing)
-
-Send play, recordir or recordrf to a topic.
-
-```js
-// Example play an action
-Topic: broadlink / fan / light;
-Message: play;
-```
-
-If using multiple device add the device id in the message.
-
-```js
-// Play action on specific device
-Topic: broadlink / fan / light;
-Message: play: bdh3hi;
-```
-
 ## OpenHAB
 
 After recorded a couple of actions it's possible to use with OpenHAB. Use same MQTT server in config settings.
@@ -200,7 +194,6 @@ Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play:
 Frame label="Fan Livingroom"  {
     Switch item=FanLights label="Lampor" mappings=[ON="Swap"]
 }
-
 
 /// EXAMPLE ADVANCED
 // Change fan speed, 6 recorded actions
