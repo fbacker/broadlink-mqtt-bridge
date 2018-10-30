@@ -1,5 +1,22 @@
 # MQTT - Broadlink
 
+<!-- TOC -->
+
+- [MQTT - Broadlink](#mqtt---broadlink)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+    - [Raspberry PI AutoInstaller](#raspberry-pi-autoinstaller)
+    - [Manually](#manually)
+  - [Configure](#configure)
+  - [Running](#running)
+    - [Web (best for Recording)](#web-best-for-recording)
+    - [MQTT (best for playing)](#mqtt-best-for-playing)
+    - [Rest API](#rest-api)
+    - [WebSocket](#websocket)
+  - [Using With OpenHAB](#using-with-openhab)
+
+<!-- /TOC -->
+
 Yet another MQTT - Broadlink Bridge.
 
 This one is built specifically with OpenHAB on a Raspberry PI in mind. However it can be used in other scenarios installation outside RPI.
@@ -175,7 +192,7 @@ Look at ./html/index.html for example. You can call actions and listen to logs.
     </script>
 ```
 
-## OpenHAB
+## Using With OpenHAB
 
 After recorded a couple of actions it's possible to use with OpenHAB. Use same MQTT server in config settings.
 
