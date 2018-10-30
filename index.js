@@ -573,7 +573,7 @@ const recordRFFrequence = data =>
     // RF Sweep found something
     const callback = dataRaw => {
       clearInterval(interval);
-      data.device.emitter.off("rawRFData", callback);
+      data.device.removeListener("rawRFData", callback);
       data.frq = dataRaw;
       resolve(data);
     };
