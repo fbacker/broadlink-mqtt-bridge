@@ -90,18 +90,18 @@ You need to specify the broadlink id in the form input field. You can list conne
 
 Send play, recordir or recordrf to a topic.
 
-```js
+```
 // Example play an action
-Topic: broadlink / fan / light;
+Topic: broadlink/fan/light;
 Message: play;
 ```
 
 If using multiple device add the device id in the message.
 
-```js
+```
 // Play action on specific broadlink device
-Topic: broadlink / fan / light;
-Message: play - bdh3hi;
+Topic: broadlink/fan/light;
+Message: play-bdh3hi;
 ```
 
 ### Rest API
