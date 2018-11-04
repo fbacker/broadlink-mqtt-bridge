@@ -212,7 +212,7 @@ router.post("/play", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
     let action = "play";
     if (req.body.id) {
-      action += ":" + req.body.id;
+      action += "-" + req.body.id;
     }
     runAction(action, req.body.topic, "api")
       .then(() => {
@@ -238,7 +238,7 @@ router.post("/recordir", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
     let action = "recordir";
     if (req.body.id) {
-      action += ":" + req.body.id;
+      action += "-" + req.body.id;
     }
     runAction(action, req.body.topic, "api")
       .then(data => {
@@ -264,7 +264,7 @@ router.post("/recordrf", function(req, res) {
   if (req.body.topic && req.body.topic !== "") {
     let action = "recordrf";
     if (req.body.id) {
-      action += ":" + req.body.id;
+      action += "-" + req.body.id;
     }
     runAction(action, req.body.topic, "api")
       .then(data => {
@@ -342,8 +342,8 @@ let actionIsRunning = false;
 function runAction(action, topic, origin) {
   action = action.toLowerCase();
   let actionMode = action;
-  if (actionMode.indexOf(":") !== -1)
-    actionMode = action.substring(0, action.indexOf(":"));
+  if (actionMode.indexOf("-") !== -1)
+    actionMode = action.substring(0, action.indexOf("-"));
   switch (actionMode) {
     case "recordir":
       return prepareAction({ action, topic, origin })
@@ -358,7 +358,6 @@ function runAction(action, topic, origin) {
           console.log("error occured", err);
           prepareAction({ action, topic, origin }).then(deviceExitLearningIR);
         });
-      break;
     case "recordrf":
       return prepareAction({ action, topic, origin })
         .then(deviceEnterLearningRFSweep)
@@ -374,12 +373,10 @@ function runAction(action, topic, origin) {
           console.log("error occured", err);
           prepareAction({ action, topic, origin }).then(deviceExitLearningRF);
         });
-      break;
     case "play":
       return prepareAction({ action, topic, origin })
         .then(playAction)
         .then(mqttPublish);
-      break;
     default:
       logger.error(`Action ${action} doesn't exists`);
       break;
@@ -411,9 +408,9 @@ const prepareAction = data =>
       let device;
       if (devices.length === 0) {
         return reject("No devices");
-      } else if (data.action.indexOf(":") !== -1) {
+      } else if (data.action.indexOf("-") !== -1) {
         // we want to select specific device
-        const deviceId = data.action.substring(data.action.indexOf(":") + 1);
+        const deviceId = data.action.substring(data.action.indexOf("-") + 1);
         for (let i = 0; i < devices.length; i++) {
           if (devices[i].host.id === deviceId) {
             device = devices[i];

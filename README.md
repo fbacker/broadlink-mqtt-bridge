@@ -101,7 +101,7 @@ If using multiple device add the device id in the message.
 ```js
 // Play action on specific broadlink device
 Topic: broadlink / fan / light;
-Message: play: bdh3hi;
+Message: play - bdh3hi;
 ```
 
 ### Rest API
@@ -187,7 +187,7 @@ Look at ./html/index.html for example. You can call actions and listen to logs.
 
         **Multiple Devices**
         If using multiple broadlink devices you need to add the id of the device you want to use.
-        Use with play:{id}, e.g. play:ds9323d
+        Use with play-{id}, e.g. play-ds9323d
         Available devices is found with socket.emit('getDevices'); and listening to socket.on('devices', function(devices) =>
     </script>
 ```
@@ -205,7 +205,7 @@ Switch OutdoorLight1 "Outdoor Porch" {mqtt=">[mqtt:broadlink/switches/outdoor/ga
 // EXAMPLE Swap light
 Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play]"}
 // or specific broadlink device
-Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play:23fdsd]"}
+Switch FanLights "Fan Lights" {mqtt=">[mqtt:broadlink/fan/light:command:ON:play-23fdsd]"}
 
 // .sitemap
 Frame label="Fan Livingroom"  {

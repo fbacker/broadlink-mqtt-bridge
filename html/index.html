@@ -173,7 +173,7 @@
                 var action = $("#formPublish button[type=submit][clicked=true]").attr('id').toLowerCase();
                 var actionDeviceId = $("#inputDeviceId").val();
                 if (actionDeviceId !== "") {
-                    action += ':' + actionDeviceId;
+                    action += '-' + actionDeviceId;
                 }
                 var topic = config.mqtt.subscribeBasePath + '/' + $("#inputTopic").val();
                 socket.emit('action', { action, topic });
