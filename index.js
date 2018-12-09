@@ -15,7 +15,7 @@ const socket = require("socket.io");
 const bodyParser = require("body-parser");
 const md5 = require("md5");
 const md5File = require("md5-file");
-const broadlink = require("./device");
+const { broadlink, discoverDevices } = require("./device");
 
 let cfg = config.util.toObject();
 
@@ -154,6 +154,7 @@ broadlink.on("device", discoveredDevice => {
   });
   */
 });
+discoverDevices();
 
 // -------------------------------------
 //             Webserver
@@ -203,6 +204,10 @@ io.on("connection", socket => {
         io.emit("devices", devs);
       })
       .catch(err => logger.error("Failed to load " + err));
+  });
+  socket.on("rescanDevices", () => {
+    logger.info("Rescan devices");
+    discoverDevices();
   });
 });
 

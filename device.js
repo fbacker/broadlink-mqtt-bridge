@@ -28,8 +28,6 @@ const discoverDevices = (count = 0) => {
   }, 5 * 1000);
 };
 
-discoverDevices();
-
 broadlink.on("deviceReady", device => {
   const macAddressParts =
     device.mac.toString("hex").match(/[\s\S]{1,2}/g) || [];
@@ -38,11 +36,7 @@ broadlink.on("deviceReady", device => {
   device.host.macAddress = macAddress;
   const ipAddress = device.host.address;
 
-  if (
-    discoveredDevices[ipAddress] ||
-    discoveredDevices[macAddress]
-  )
-    return;
+  if (discoveredDevices[ipAddress] || discoveredDevices[macAddress]) return;
   /*
     console.log(
       `Discovered Broadlink RM device at ${device.host.macAddress} (${
@@ -50,13 +44,12 @@ broadlink.on("deviceReady", device => {
       })`
     );
   */
- 
- 
+
   //device.host.id = macAddressParts.join('').substring(0,4) + ipAddressParts.slice(2).join('');
-  device.host.id = macAddressParts.join('');
+  device.host.id = macAddressParts.join("");
   discoveredDevices[ipAddress] = device;
   discoveredDevices[macAddress] = device;
   myEmitter.emit("device", device);
 });
 
-module.exports = myEmitter;
+module.exports = { broadlink: myEmitter, discoverDevices };
