@@ -1,21 +1,6 @@
 # MQTT - Broadlink
 
-<!-- TOC -->
-
-- [MQTT - Broadlink](#mqtt---broadlink)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-    - [Raspberry PI AutoInstaller](#raspberry-pi-autoinstaller)
-    - [Manually](#manually)
-  - [Configure](#configure)
-  - [Running](#running)
-    - [Web (best for Recording)](#web-best-for-recording)
-    - [MQTT (best for playing)](#mqtt-best-for-playing)
-    - [Rest API](#rest-api)
-    - [WebSocket](#websocket)
-  - [Using With OpenHAB](#using-with-openhab)
-
-<!-- /TOC -->
+<!-- TOC -->autoauto- [MQTT - Broadlink](#mqtt---broadlink)auto    - [Requirements](#requirements)auto    - [Installation](#installation)auto        - [Raspberry PI AutoInstaller](#raspberry-pi-autoinstaller)auto        - [Manually](#manually)auto    - [Configure](#configure)auto    - [Running](#running)auto        - [Web (best for Recording)](#web-best-for-recording)auto        - [MQTT (best for playing)](#mqtt-best-for-playing)auto        - [Rest API](#rest-api)auto        - [WebSocket](#websocket)auto    - [Using With OpenHAB](#using-with-openhab)autoauto<!-- /TOC -->
 
 Yet another MQTT - Broadlink Bridge.
 
@@ -72,6 +57,8 @@ in ./config there's a couple of options in default.json. Do not change this. Thi
 Make your own file `./config/local.json` and only add and change values that you want.
 
 **NOTE:** Changing the default.json will break updates.
+
+**NOTE2:** mqtt node properties that can be used, look here: https://www.npmjs.com/package/mqtt#client
 
 ## Running
 
