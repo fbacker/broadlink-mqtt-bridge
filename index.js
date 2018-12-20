@@ -130,6 +130,7 @@ broadlink.on("discoverCompleted", numOfDevice => {
 
 // a broadlink device is found
 broadlink.on("device", discoveredDevice => {
+  console.log("new device", discoverDevices);
   devices.push(discoveredDevice);
   logger.info("Broadlink Found Device", discoveredDevice.host);
   discoveredDevice.on("temperature", temperature =>
@@ -207,6 +208,7 @@ io.on("connection", socket => {
   });
   socket.on("rescanDevices", () => {
     logger.info("Rescan devices");
+    devices = [];
     discoverDevices();
   });
 });
