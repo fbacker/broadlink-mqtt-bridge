@@ -37,7 +37,18 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bri
 
 This will install the broadlink-mqtt-bridge project in /srv/openhab2-conf/broadlink-mqtt-bridge/. At the end of the installer you will have an option to make the project run automatic at boot.
 
-To upgrade to latest version just run the script again or run `git pull` in the app directory.
+To upgrade to latest version just run the script again.
+
+You can control the service with
+
+```js
+// Start service
+sudo systemctl start broadlinkbridge.service
+// Stop service
+sudo systemctl stop broadlinkbridge.service
+// Restart service
+sudo systemctl restart broadlinkbridge.service
+```
 
 ### Manually
 
