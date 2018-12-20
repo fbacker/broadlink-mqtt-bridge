@@ -43,7 +43,7 @@ To upgrade to latest version just run the script again or run `git pull` in the 
 
 ```js
 // install
-cd /home/openhabian/
+cd /srv/openhab2-conf/
 git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
 cd broadlink-mqtt-bridge
 npm install
