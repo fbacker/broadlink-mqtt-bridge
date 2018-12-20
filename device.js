@@ -9,16 +9,13 @@ const discoveredDevices = {};
 const limit = 5;
 let discovering = false;
 
-const discoverDevices = (count = 0) => {
+const discoverDevicesLoop = (count = 0) => {
   console.log("Discover device", count);
   discovering = true;
-  if (count >= 5) {
+  if (count === 0) {
     console.log("Discover complete, broadcast devices");
     discoveredDevices;
-    myEmitter.emit(
-      "discoverCompleted",
-      Object.keys(discoveredDevices).length / 2
-    );
+    myEmitter.emit("discoverCompleted", Object.keys(discoveredDevices).length);
     Object.keys(discoveredDevices).forEach(device => {
       myEmitter.emit("device", discoveredDevices[device]);
     });
@@ -27,11 +24,17 @@ const discoverDevices = (count = 0) => {
   }
 
   broadlink.discover();
-  count++;
+  count--;
 
   setTimeout(() => {
-    discoverDevices(count);
+    discoverDevicesLoop(count);
   }, 5 * 1000);
+};
+
+const discoverDevices = () => {
+  if (discovering) return;
+  discovering = true;
+  discoverDevicesLoop(5);
 };
 
 broadlink.on("deviceReady", device => {
