@@ -1,8 +1,17 @@
-# MQTT - Broadlink
+# Yet another MQTT - Broadlink Bridge
 
-<!-- TOC -->autoauto- [MQTT - Broadlink](#mqtt---broadlink)auto    - [Requirements](#requirements)auto    - [Installation](#installation)auto        - [Raspberry PI AutoInstaller](#raspberry-pi-autoinstaller)auto        - [Manually](#manually)auto    - [Configure](#configure)auto    - [Running](#running)auto        - [Web (best for Recording)](#web-best-for-recording)auto        - [MQTT (best for playing)](#mqtt-best-for-playing)auto        - [Rest API](#rest-api)auto        - [WebSocket](#websocket)auto    - [Using With OpenHAB](#using-with-openhab)autoauto<!-- /TOC -->
-
-Yet another MQTT - Broadlink Bridge.
+- [MQTT - Broadlink](#mqtt---broadlink)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Raspberry PI AutoInstaller](#raspberry-pi-autoinstaller)
+- [Manually](#manually)
+- [Configure](#configure)
+- [Running](#running)
+- [Web (best for Recording)](#web-best-for-recording)
+- [MQTT (best for playing)](#mqtt-best-for-playing)
+- [Rest API](#rest-api)
+- [WebSocket](#websocket)
+- [Using With OpenHAB](#using-with-openhab)
 
 This one is built specifically with OpenHAB on a Raspberry PI in mind. However it can be used in other scenarios installation outside RPI.
 
