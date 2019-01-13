@@ -8,7 +8,7 @@ const mqtt = require("mqtt");
 const fs = require("fs");
 const path = require("path");
 const CircularJSON = require("circular-json");
-var shell = require("shelljs");
+const shell = require("shelljs");
 const express = require("express");
 const http = require("http");
 const socket = require("socket.io");
@@ -337,7 +337,12 @@ router.get("/devices", function(req, res) {
       });
     });
 });
-
+router.get("/devices/discover", function(req, res) {
+  logger.info("Rescan devices");
+  devices = [];
+  discoverDevices();
+  res.json({ success: true });
+});
 app.use("/api", router);
 
 // -------------------------------------

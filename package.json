@@ -8,15 +8,15 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "broadlinkjs-rm": "^0.6.0",
-    "circular-json": "^0.5.5",
-    "config": "^2.0.1",
-    "express": "^4.16.3",
+    "broadlinkjs-rm": "lprhodes/broadlinkjs-rm#12/head",
+    "circular-json": "^0.5.9",
+    "config": "^3.0.1",
+    "express": "^4.16.4",
     "md5": "^2.2.1",
     "md5-file": "^4.0.0",
     "mqtt": "^2.18.8",
-    "shelljs": "^0.8.2",
-    "socket.io": "^2.1.1",
+    "shelljs": "^0.8.3",
+    "socket.io": "^2.2.0",
     "winston": "^3.1.0"
   }
 }

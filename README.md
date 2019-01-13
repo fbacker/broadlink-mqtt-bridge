@@ -152,6 +152,12 @@ curl --header "Content-Type: application/json" \
 curl --header "Content-Type: application/json" \
   --request GET \
   http://localhost:3000/api/devices
+
+// Rescan for devices
+curl --header "Content-Type: application/json" \
+  --request GET \
+  http://localhost:3000/api/devices/discover
+
 ```
 
 ### WebSocket
