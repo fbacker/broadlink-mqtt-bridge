@@ -18,6 +18,7 @@ const md5File = require("md5-file");
 const { broadlink, discoverDevices } = require("./device");
 
 let cfg = config.util.toObject();
+let devices = [];
 
 if (process.env.DOCKER && process.env.DOCKER === "true") {
   //  process.env["NODE_CONFIG_DIR"] = "/config";
@@ -81,10 +82,7 @@ logger.info("Starting Broadlink MQTT NodeJS Application");
 var mqttOptions = cfg.mqtt;
 logger.info("MQTT Options", mqttOptions);
 
-var mqttClient = mqtt.connect(
-  "",
-  mqttOptions
-);
+var mqttClient = mqtt.connect("", mqttOptions);
 mqttClient.on("connect", function(connack) {
   logger.info("MQTT Connected", connack);
   // listen to actions
@@ -112,13 +110,12 @@ mqttClient.on("message", function(topic, message) {
   logger.debug("MQTT Message", { topic, msg });
   runAction(msg, topic, "mqtt")
     .then(data => console.log("mqtt done", data))
-    .catch(err => console.error("mqtt failed", err));
+    .catch(err => console.error("mqtt failed on message", err));
 });
 
 // -------------------------------------
 //            Setup Broadlink
 // -------------------------------------
-let devices = [];
 
 // after a while this is triggered
 broadlink.on("discoverCompleted", numOfDevice => {
@@ -155,7 +152,6 @@ broadlink.on("device", discoveredDevice => {
   });
   */
 });
-discoverDevices();
 
 // -------------------------------------
 //             Webserver
@@ -731,3 +727,5 @@ const getDevicesInfo = () =>
     }
     resolve(devs);
   });
+
+discoverDevices();
