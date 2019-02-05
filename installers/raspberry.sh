@@ -77,7 +77,8 @@ if [ -d "./broadlink-mqtt-bridge" ] ; then
     cd /srv/openhab2-conf/broadlink-mqtt-bridge
 
     echo -e "\e[96mUpgrade ...\e[90m"
-    if git reset --hard; then 
+	git reset --hard
+    if git pull; then 
         echo -e "\e[92mUpgrade Done!\e[0m"
 		npm install
 		sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
