@@ -1,5 +1,4 @@
 // If docker, config files are in another dir
-console.log("env", process.env);
 
 // Make the imports
 const config = require("config");
@@ -30,7 +29,7 @@ if (process.env.DOCKER && process.env.DOCKER === "true") {
 
 var io = null;
 const commandsPath = cfg.recording.path || path.join(__dirname, "commands");
-console.log("commandsPath", commandsPath);
+
 // -------------------------------------
 //      SETUP LOGGER with Winston
 // -------------------------------------
@@ -39,7 +38,14 @@ console.log("commandsPath", commandsPath);
 const logger = winston.createLogger({
   level: "debug",
   format: winston.format.json(),
-  transports: [new winston.transports.File({ filename: "output.log" })]
+  transports: [
+    new winston.transports.File({
+      filename: "output.log",
+      maxsize: 200,
+      tailable: true
+    })
+    //new winston.transports.Http({ path: "log", port:3001 })
+  ]
 });
 
 // Output stream to socket.io
