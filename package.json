@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "broadlinkjs-rm": "git+https://github.com/KaloNikolov/broadlinkjs-rm#patch-1",
+    "broadlinkjs-rm": "git+https://github.com/fbacker/broadlinkjs-rm",
     "circular-json": "^0.5.9",
     "config": "^3.0.1",
     "express": "^4.16.4",
