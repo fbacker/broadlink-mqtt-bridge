@@ -4,6 +4,7 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Raspberry PI AutoInstaller](#raspberry-pi-autoinstaller)
+- [Docker](#docker)
 - [Manually](#manually)
 - [Configure](#configure)
 - [Running](#running)
@@ -48,6 +49,31 @@ sudo systemctl start broadlinkbridge.service
 sudo systemctl stop broadlinkbridge.service
 // Restart service
 sudo systemctl restart broadlinkbridge.service
+```
+
+### Docker
+
+```bash
+docker build -t fbacker/broadlink-mqtt-bridge .
+
+docker run --network=host \
+  -v "$PWD/config/local.json:/broadlink-mqtt-bridge/config/local.json" \
+  -v "$PWD/commands:/broadlink-mqtt-bridge/commands" \
+  fbacker/broadlink-mqtt-bridge
+```
+
+#### Docker Compose
+
+```yml
+version: '3.7'
+services:
+  broadlink-mqtt-bridge:
+    image: "fbacker/broadlink-mqtt-bridge"
+    restart: always
+    network_mode: host
+    volumes:
+      - "./config/local.json:/broadlink-mqtt-bridge/config/local.json"
+      - "./commands:/broadlink-mqtt-bridge/commands"
 ```
 
 ### Manually
