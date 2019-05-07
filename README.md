@@ -54,7 +54,6 @@ sudo systemctl restart broadlinkbridge.service
 ### Docker
 
 ```bash
-docker build -t fbacker/broadlink-mqtt-bridge .
 
 docker run --network=host \
   -v "$PWD/config/local.json:/broadlink-mqtt-bridge/config/local.json" \
@@ -65,7 +64,7 @@ docker run --network=host \
 #### Docker Compose
 
 ```yml
-version: '3.7'
+version: "3.7"
 services:
   broadlink-mqtt-bridge:
     image: "fbacker/broadlink-mqtt-bridge"
