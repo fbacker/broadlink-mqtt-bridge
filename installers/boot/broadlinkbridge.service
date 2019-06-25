@@ -4,7 +4,7 @@ After=mosquitto.service
 
 [Service]
 WorkingDirectory=/srv/openhab2-conf/broadlink-mqtt-bridge/
-ExecStart= /usr/bin/node index.js
+ExecStart=/usr/bin/node index.js
 Restart=always
 RestartSec=10
 Environment=NODE_ENV=production
