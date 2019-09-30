@@ -41,7 +41,9 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.File({
       filename: "output.log",
-      tailable: true
+      tailable: true,
+      maxsize: 2000000,
+      maxFiles: 1
     })
     //new winston.transports.Http({ path: "log", port:3001 })
   ]
