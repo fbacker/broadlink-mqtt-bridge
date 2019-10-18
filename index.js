@@ -141,7 +141,7 @@ broadlink.on("device", discoveredDevice => {
     {
       logger.debug(`Broadlink Temperature ${temperature}`, discoveredDevice.host);
       try {
-        mqttClient.publish(`${mqttOptions.subscribeBasePath}/${discoveredDevice.host.id}/temperature`, temperature.toString());  
+        mqttClient.publish(`${mqttOptions.subscribeBasePath}-stat/${discoveredDevice.host.id}/temperature`, temperature.toString());  
       } catch (error) {
         logger.error("Temperature publish error", error);
       }

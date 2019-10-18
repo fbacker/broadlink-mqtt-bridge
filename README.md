@@ -143,8 +143,8 @@ Request temperature publishing from specific device:
 Topic: broadlink/livingroom/temperature;
 Message: temperature-bdh3hi;
 // The temperature will be published later with the proper topic:
-// broadlink/[device id]/temperature
-broadlink/bdh3hi/temperature
+// broadlink-stat/[device id]/temperature
+broadlink-stat/bdh3hi/temperature
 // The message value will be the tempeature
 ```
 ### Rest API
