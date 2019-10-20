@@ -136,6 +136,17 @@ Topic: broadlink/fan/light;
 Message: play-bdh3hi;
 ```
 
+Request temperature publishing from specific device:
+```
+// Send a topic with a device name (e.g. livingroom) and request temperature
+// Message is temperature-[device id]
+Topic: broadlink/livingroom/temperature;
+Message: temperature-bdh3hi;
+// The temperature will be published later with the proper topic:
+// broadlink-stat/[device id]/temperature
+broadlink-stat/bdh3hi/temperature
+// The message value will be the tempeature
+```
 ### Rest API
 
 It's possible to use api to calls for play and recording actions. Note that recording wont give help information as when using the web api.
@@ -269,4 +280,25 @@ end
 
 // .sitemap
 Selection item=FanSpeed mappings=[1="1", 2="2", 3="3", 4="4", 5="5", 6="6"]
+
+/// EXAMPLE TEMPERATURE
+
+// .items
+Number LivingRoomTemperature "Living Room Temperature [%s C]" <temperature>
+  { mqtt="<[mqttbroker:broadlink/23fdsd/temperature:state:default]"}
+
+// .rules
+// Query the temperature every 5 minuts using cron and when system started
+rule "getLivingRoomTemperature"
+when
+    Time cron "0 0/5 * 1/1 * ? *" or
+    System started
+then
+    val topic = "broadlink/livingroom/temperature"
+    publish("mqtt", topic, "play-23fdsd")
+end
+
+// .sitemap
+Text item=LivingRoomTemperature label="Living Room Temperature"
+
 ```

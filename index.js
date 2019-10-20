@@ -41,6 +41,7 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.File({
       filename: "output.log",
+      tailable: true,
       maxsize: 2000000,
       maxFiles: 1
     })
@@ -137,7 +138,15 @@ broadlink.on("device", discoveredDevice => {
   devices.push(discoveredDevice);
   logger.info("Broadlink Found Device", discoveredDevice.host);
   discoveredDevice.on("temperature", temperature =>
-    logger.debug(`Broadlink Temperature ${temperature}`, discoveredDevice.host)
+    {
+      logger.debug(`Broadlink Temperature ${temperature}`, discoveredDevice.host);
+      try {
+        mqttClient.publish(`${mqttOptions.subscribeBasePath}-stat/${discoveredDevice.host.id}/temperature`, temperature.toString());  
+      } catch (error) {
+        logger.error("Temperature publish error", error);
+      }
+      
+    }
   );
   /*
   // IR or RF signal found
@@ -391,11 +400,20 @@ function runAction(action, topic, origin) {
       return prepareAction({ action, topic, origin })
         .then(playAction)
         .then(mqttPublish);
+    case "temperature":
+      return prepareAction({ action, topic, origin })
+        .then(queryTemperature)
     default:
       logger.error(`Action ${action} doesn't exists`);
+      return handleActionError(`Action ${action} doesn't exists`);
       break;
   }
 }
+// Properly handle invalid action input to runAction
+const handleActionError = data =>
+  new Promise((resolve, reject) => {
+    resolve(data);
+  });
 
 // Handle incoming actions from MQTT
 const prepareAction = data =>
@@ -404,7 +422,7 @@ const prepareAction = data =>
     if (data.topic.indexOf(mqttOptions.subscribeBasePath) === 0) {
       if (data.topic.split("/").length < 3) {
         logger.error(
-          "Topic is to short, should contain broadcast base e.g. 'broadlink' with following device and action. e.g. broadlink/tv/samsung/power"
+          "Topic is too short, should contain broadcast base e.g. 'broadlink' with following device and action. e.g. broadlink/tv/samsung/power"
         );
         reject("Stopped prepareAction");
         return;
@@ -605,6 +623,18 @@ const playAction = data =>
       }
     });
   });
+
+const queryTemperature = data =>
+new Promise((resolve, reject) => {
+  logger.info("queryTemperature");
+  try {
+    data.device.checkTemperature();
+    resolve(data);
+  } catch (error) {
+    logger.error("Failed to query temperature");
+    reject("Stopped at queryTemperature");
+  }
+});
 
 const handleListAllActions = data =>
   new Promise((resolve, reject) => {
