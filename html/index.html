@@ -9,8 +9,9 @@
     />
 
     <style>
-      body {
-        padding: 30px;
+      body,
+      html {
+        height: 100%;
       }
       .icon-duplicate {
         position: relative;
@@ -21,200 +22,323 @@
     </style>
     <link
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/themes/default/style.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
-      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+      href="https://use.fontawesome.com/releases/v5.11.2/css/all.css"
+      integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN"
       crossorigin="anonymous"
     />
   </head>
 
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <h1>MQTT Broadlink Bridge</h1>
-          <p>
-            Publish actions to MQTT or use this WebGUI to record and replay
-            actions for Broadlink devices.
-          </p>
-        </div>
+    <div id="progressScanning" class="row" style="padding: 10px;">
+      <div class="progressLabel col-3">Scanning for devices</div>
+      <div class="progressLabel col-9">
+        <div
+          id="progressScanningBar"
+          class="progress-bar progress-bar-striped progress-bar-animated"
+          role="progressbar"
+          style="width: 75%; height: 25px;"
+        ></div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="col-md-6">
-          <h4>Publish to MQTT</h4>
-          <form id="formPublish">
-            <div class="form-group input-group">
-              <small
-                id="topicHelp"
-                class="form-text text-muted"
-                style="padding-bottom: 20px;"
-                >Topic to broadcast. So you will add device name/action. E.g.
-                tv/samsung/power</small
+    <div id="progressRecording" class="row" style="padding: 10px;">
+      <div class="progressLabel col-4">
+        Recording <span id="recordLabelType" class="text-uppercase"></span>:
+        <span id="recordLabelDescription"></span>
+      </div>
+      <div class="progressLabel col-8">
+        <div
+          id="progressRecordingBar"
+          class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+          role="progressbar"
+          style="width: 75%; height: 25px;"
+        ></div>
+      </div>
+    </div>
+
+    <div class="alert alert-success" id="success-config">
+      <button type="button" class="close" data-dismiss="alert">x</button>
+      <strong>Success! </strong> Config is loaded. You can start working.
+    </div>
+
+    <div class="container">
+      <div class="row" style="margin-top:20px;">
+        <div class="col-md-6 col-sm-12">
+          <div
+            style="display: inline-flex; justify-content: space-between; width: 100%;"
+          >
+            <h4 style="display: inline-block;">
+              <i class="fas fa-stream"></i> Commands
+            </h4>
+            <span>
+              <button
+                type="button"
+                id="btnRefreshFiles"
+                class="btn btn-primary btn-sm"
               >
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="configMQTT"></span>
-              </div>
-              <input
-                type="input"
-                required
-                class="form-control"
-                id="inputTopic"
-                aria-describedby="topicHelp"
-                placeholder="Enter Topic"
-              />
-            </div>
-
-            <div class="form-group ">
-              <input
-                type="input"
-                class="form-control"
-                id="inputDeviceId"
-                aria-describedby="deviceHelp"
-                placeholder="Enter Device ID"
-              />
-              <small
-                id="deviceHelp"
-                class="form-text text-muted"
-                style="padding-bottom: 20px;"
-                >If multiple devices set the id</small
-              >
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="recordIR">
-              Record IR
-            </button>
-            <button type="submit" class="btn btn-primary" id="recordRF">
-              Record RF
-            </button>
-            <button type="submit" class="btn btn-info" id="play">Play</button>
-            <button type="button" class="btn btn-info" id="list">
-              List actions
-            </button>
-            <button type="button" class="btn btn-info" id="devices">
-              List devices
-            </button>
-            <button type="button" class="btn btn-info" id="devicesRescan">
-              Rescan devices
-            </button>
-          </form>
-        </div>
-        <div class="col-md-6">
-          <h4>
-            Actions
-            <span
-              ><button
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+              <button
                 type="button"
                 id="btnDelete"
                 class="btn btn-danger btn-sm"
                 disabled
               >
-                Delete</button
-              ><button
-                type="button"
-                id="btnRefreshFiles"
-                class="btn btn-primary btn-sm"
-              >
-                Refresh
-              </button></span
-            >
-          </h4>
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </span>
+          </div>
+          <div class="w-100"></div>
           <div id="jstree"></div>
+          <div class="w-100"></div>
+          <div
+            style="display: inline-flex; justify-content: space-between; width: 100%;"
+          >
+            <h4 style="display: inline-block; margin-top: 15px;">
+              <i class="far fa-hdd"></i> Devices
+            </h4>
+            <span style="margin-top: 13px;">
+              <button
+                type="button"
+                class="btn btn-info btn-sm"
+                id="btnDevicesRescan"
+              >
+                <i class="fas fa-binoculars"></i> Rescan devices
+              </button>
+            </span>
+          </div>
+          <div id="listDevices">
+            <span id="listDevicesNoDevice">--- no devices ---</span>
+          </div>
         </div>
-      </div>
-      <div class="row" style="padding-top: 20px">
-        <div class="col-12">
-          <h4>Logs</h4>
-          <ul id="logs" class="list-group"></ul>
+
+        <div class="col-md-6 col-sm-12">
+          <div
+            style="display: inline-flex; justify-content: space-between; width: 100%;"
+          >
+            <h4 style="display: inline-block; ">
+              <i class="far fa-hdd"></i> Publish to MQTT
+            </h4>
+            <span style="margin-top: 13px;">
+              <button
+                type="button"
+                class="btn btn-info  btn-sm"
+                id="btnLogFullscreen"
+              >
+                <i class="fas fa-external-link-alt"></i> Show Log fullscreen
+              </button>
+            </span>
+          </div>
+          <form id="formPublish">
+            <div class="form-group row">
+              <label for="inputTopic" class="col-sm-2 col-form-label"
+                >Topic*</label
+              >
+              <div class="col-sm-10">
+                <input
+                  class="form-control"
+                  id="inputTopic"
+                  placeholder="/broadlink/"
+                  type="text"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="inputMessage" class="col-sm-2 col-form-label"
+                >Message*</label
+              >
+              <div class="col-sm-10">
+                <input
+                  class="form-control"
+                  id="inputMessage"
+                  placeholder=""
+                  type="text"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="inputDevice" class="col-sm-2 col-form-label"
+                >Device</label
+              >
+              <div class="col-sm-10">
+                <input
+                  class="form-control"
+                  id="inputDevice"
+                  placeholder=""
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-2"></div>
+              <div class="col">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  id="btnRecordIR"
+                >
+                  <i class="fas fa-microphone-alt"></i> Record IR
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  id="btnRecordRF"
+                >
+                  <i class="fas fa-broadcast-tower"></i> Record RF
+                </button>
+                <button type="submit" class="btn btn-info btn-sm" id="btnPlay">
+                  <i class="far fa-play-circle"></i> Play
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
 
+    <!-- logs -->
+    <div style="height: 100%; margin-top: 10px;">
+      <iframe
+        id="iframeLog"
+        style="width: 100%; height: 100%; border:none;"
+      ></iframe>
+    </div>
+
+    <!-- scripts -->
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/jstree.min.js"></script>
+
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 
     <script>
+      // click, set configMQTT before
       $(function() {
         var config = null;
         var socket = io();
         var selectedNode = null;
 
-        const log = function(msg) {
-          console.log("msg from server", msg);
-          // nice colors
-          var color = msg.level;
-          if (color === "error") color = "warning";
-          if (color === "debug") color = "light";
-          // Is there a object
-          var obj = Object.assign({}, msg);
-          delete obj.message;
-          delete obj.level;
-          delete obj.transport;
-          if (Object.keys(obj).length !== 0) {
-            obj = `<pre>${JSON.stringify(obj, undefined, 2)}</pre>`;
-          } else {
-            obj = "";
-          }
+        $("#success-config").hide();
+        $("#progressScanning").hide();
+        $("#progressRecording").hide();
 
-          var obj = `<li class=\"list-group-item bg-${color}\">${
-            msg.message
-          } ${obj}</li>`;
-          $("#logs").prepend(obj);
+        const setup = () => {
+          // set logs in iframe url
+          const matches = window.location.href.match(
+            /^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i
+          );
+          const domain = matches && matches[1]; // domain will be null if no match is found
+          document.getElementById(
+            "iframeLog"
+          ).src = `http://${domain}:${config.gui.logs}/`;
+
+          // show that you can start to work
+          $("#success-config")
+            .fadeTo(2000, 500)
+            .slideUp(500, () => {
+              $("#success-config").slideUp(500);
+            });
         };
 
-        socket.on("connection", function(socket) {
-          // connected
-        });
-        socket.on("log", function(msg) {
-          log(msg);
-        });
-        socket.on("config", function(msg) {
+        // Loaded config from server
+        socket.on("config", msg => {
           config = msg;
-          console.log("config", msg);
-          $("#configMQTT").text(`${config.mqtt.subscribeBasePath}/`);
-          log({ level: "info", message: "Config is loaded", config });
-        });
-        socket.on("actions", function(msg) {
-          console.log("actions that can be played", msg);
+          setup();
         });
 
-        $("#list").click(function() {
-          socket.emit("getActions");
+        socket.on("record", (type, label, progress) => {
+          if (type === "running") {
+            alert("Recording is already running");
+            return;
+          }
+          if (label === "exit") {
+            $("#progressRecordingBar").css("width", `100%`);
+            setTimeout(() => $("#progressRecording").hide(), 500);
+            return;
+          }
+          $("#progressRecording").show();
+          $("#recordLabelType").text(type);
+          $("#recordLabelDescription").text(label);
+          $("#progressRecordingBar").css("width", `${progress}%`);
         });
-        $("#devices").click(function() {
-          socket.emit("getDevices");
+
+        socket.on("deviceScan", progress => {
+          $("#progressScanning").show();
+          $("#progressScanningBar").css("width", `${progress}%`);
         });
-        $("#devicesRescan").click(function() {
-          socket.emit("rescanDevices");
+
+        socket.on("deviceScanComplete", () => {
+          $("#progressScanningBar").css("width", `100%`);
+          setTimeout(() => $("#progressScanning").hide(), 500);
         });
-        $("#btnRefreshFiles").click(function() {
+
+        socket.on("device", msg => {
+          console.log("device", msg);
+          $("#listDevicesNoDevice").remove(); // remove tmp text
+          var e = $(`#${msg.id}`);
+          if (e.length === 0) {
+            e = `<div id="${msg.id}" style="margin-top:5px;">
+                              <div class="row">
+                                <div class="col">${msg.model}</div>
+                                <div class="col-5 text-right">${msg.address}</div>
+                              </div>
+                              <div class="row">
+                                <div class="col">ID: ${msg.id}</div>
+                                <div class="col-5 text-right"><div class="btn btn-sm btn-primary deviceSelector">SELECT</div></div>
+                              </div>
+                            </div>`;
+            $("#listDevices").append(e);
+          }
+        });
+
+        $("#listDevices").on("click", "div div div .deviceSelector", e => {
+          const id = $(e.target)
+            .parent()
+            .parent()
+            .parent()
+            .attr("id");
+          $("#inputDevice").val(id);
+        });
+
+        $("#btnDevicesRescan").click(() => {
+          $("#listDevices").empty();
+          $.ajax({
+            type: "GET",
+            url: "/api/rescan"
+          });
+        });
+        $("#btnRefreshFiles").click(() => {
           loadTreeData();
         });
-        $("#btnDelete").click(function() {
+        $("#btnDelete").click(() => {
           if (!selectedNode) {
             alert("Please select a file in the tree");
             return;
@@ -230,33 +354,59 @@
             });
           }
         });
-        $("form button[type=submit]").click(function() {
-          $("button[type=submit]", $(this).parents("form")).removeAttr(
-            "clicked"
-          );
-          $(this).attr("clicked", "true");
+        $("form button[type=submit]").click(e => {
+          $("button[type=submit]", $(this)).removeAttr("clicked");
+          $(e.currentTarget).attr("clicked", "true");
         });
-        $("#formPublish").submit(function(e) {
+        $("#formPublish").submit(e => {
           e.preventDefault();
           if (config === null) {
             alert("Config is missing. It hasn't been loaded yet");
             return;
           }
+
           var action = $("#formPublish button[type=submit][clicked=true]")
             .attr("id")
-            .toLowerCase();
-          var actionDeviceId = $("#inputDeviceId").val();
-          if (actionDeviceId !== "") {
-            action += "-" + actionDeviceId;
+            .toLowerCase()
+            .substr(3);
+          const topic = $("#inputTopic").val();
+          const message = $("#inputMessage").val();
+          const device = $("#inputDevice").val();
+          let type;
+          switch (action) {
+            case "recordir":
+            case "recordrf":
+              type = action.substr(-2);
+              action = "record";
+              if (device === "") {
+                // we need a specific device to record
+                alert(
+                  "You need to select a specific device to make an recording"
+                );
+                return;
+              }
+              break;
           }
-          var topic =
-            config.mqtt.subscribeBasePath + "/" + $("#inputTopic").val();
-          socket.emit("action", { action, topic });
+
+          $("html, body").animate({ scrollTop: 0 }, "slow");
+          $.ajax({
+            type: "POST",
+            url: `/api/${action}`,
+            data: { topic, message, device, type },
+            success: json => {
+              alert(json.message);
+              loadTreeData();
+            },
+            error: err => {
+              alert(err.responseJSON.message);
+            }
+          });
         });
 
         let hashList = [];
         let hashDuplicates = [];
 
+        // jstree plugin to render a duplicate
         $.jstree.plugins.duplicate = function(options, parent) {
           this.redraw_node = function(obj, deep, callback, force_draw) {
             var node_id = obj;
@@ -278,7 +428,8 @@
           };
         };
 
-        const deepLookForDuplicates = function(node) {
+        // Look for duplicates of hashed files to display
+        const deepLookForDuplicates = node => {
           if (node.type === "file") {
             if (hashList.includes(node.hash)) {
               if (!hashDuplicates.includes(node.hash)) {
@@ -294,7 +445,8 @@
           }
         };
 
-        const loadTreeData = function() {
+        // Load files to populate the tree
+        const loadTreeData = () => {
           $.ajax({
             url: "/api/files",
             success: function(data) {
@@ -311,6 +463,7 @@
           });
         };
 
+        // load tree and settings
         const tree = $("#jstree").jstree({
           core: {
             animation: 100,
@@ -333,12 +486,16 @@
           plugins: ["sort", "state", "types", "duplicate"]
         });
 
-        $("#jstree").on("changed.jstree", function(e, data) {
+        // CLICK IN TREE
+        $("#jstree").on("changed.jstree", (e, data) => {
           if (data.node && data.node.type === "file") {
             let p = data.node.original.path;
             p = p.substr(p.indexOf("/") + 1);
             p = p.substring(p, p.lastIndexOf("."));
-            $("#inputTopic").val(p);
+            const p1 = p.substring(p.lastIndexOf("/") + 1);
+            const p2 = p.substring(p, p.lastIndexOf("/"));
+            $("#inputTopic").val(config.mqtt.subscribeBasePath + p2);
+            $("#inputMessage").val(p1);
             $("#btnDelete").attr("disabled", false);
             selectedNode = data.node.original;
           } else {
@@ -346,7 +503,7 @@
             selectedNode = null;
           }
         });
-        $("#jstree").on("state_ready.jstree", function(e, data) {
+        $("#jstree").on("state_ready.jstree", (e, data) => {
           loadTreeData();
         });
       });
