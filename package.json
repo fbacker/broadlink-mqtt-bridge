@@ -6,11 +6,13 @@
   "scripts": {
     "start": "node -r esm index.js",
     "dev": "nodemon -r esm --inspect index.js localhost 3000",
-    "logs": "frontail --port 3001 --disable-usage-stats output.log"
+    "logs": "frontail --port 3001 --disable-usage-stats output.log",
+    "production": "concurrently \"npm run start\" \"npm run logs\""
   },
   "dependencies": {
     "body-parser": "^1.19.0",
     "broadlinkjs-rm": "git+https://github.com/fbacker/broadlinkjs-rm",
+    "concurrently": "^5.0.0",
     "config": "^3.2.3",
     "esm": "^3.2.25",
     "express": "^4.17.1",
