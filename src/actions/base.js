@@ -15,7 +15,7 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
   }
 
   data.topic = data.topic.toLowerCase();
-  data.action = data.message.toLowerCase(); // logging output doesn't work with the name message
+  data.message = data.message.toLowerCase(); // logging output doesn't work with the name message
   const actionPath = data.topic.substr(config.settings.mqtt.subscribeBasePath.length);
   const filePath = `${path.join(config.commandsPath, actionPath, data.message)}.bin`;
   const folderPath = filePath.substr(0, filePath.lastIndexOf('/'));
