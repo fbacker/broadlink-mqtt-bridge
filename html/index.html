@@ -135,7 +135,7 @@
                 class="btn btn-info  btn-sm"
                 id="btnLogFullscreen"
               >
-                <i class="fas fa-external-link-alt"></i> Show Log fullscreen
+                <i class="fas fa-external-link-alt"></i> Show Log
               </button>
             </span>
           </div>
@@ -332,7 +332,13 @@
           $("#listDevices").empty();
           $.ajax({
             type: "GET",
-            url: "/api/rescan"
+            url: "/api/rescan",
+            success: data => {
+              console.log("Scan data", data);
+              if (!data.running.isRunning) {
+                alert("Scan is blocked. Try in a few seconds.");
+              }
+            }
           });
         });
         $("#btnRefreshFiles").click(() => {
@@ -353,6 +359,10 @@
               }
             });
           }
+        });
+        $("#btnLogFullscreen").click(e => {
+          const url = `http://${window.location.hostname}:${config.gui.logs}`;
+          window.open(url);
         });
         $("form button[type=submit]").click(e => {
           $("button[type=submit]", $(this)).removeAttr("clicked");

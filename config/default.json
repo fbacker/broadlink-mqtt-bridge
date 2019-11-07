@@ -5,6 +5,12 @@
     "protocol": "mqtt",
     "subscribeBasePath": "broadlink/"
   },
+  "queue": {
+    "delay": 500
+  },
+  "webhooks": {
+    "scanCompleted": null
+  },
   "recording": {
     "timeout": {
       "ir": 15,

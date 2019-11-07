@@ -4,6 +4,7 @@ import express from 'express';
 import http from 'http';
 import socket from 'socket.io';
 import bodyParser from 'body-parser';
+import request from 'request';
 import broadlink from './broadlink';
 import mqtt from './mqtt';
 import config from './config';
@@ -60,7 +61,10 @@ class WebserverClass {
     router.post('/play', (req, res) => {
       const { topic, message } = req.body;
       if (topic !== '' && message !== '') {
-        mqtt.publish(topic, message, () => res.json());
+        mqtt.publish(topic, message, () => {
+          logger.debug('Sent message to mqtt');
+          res.json({ message: 'Message sent to MQTT' });
+        });
       } else {
         res.statusCode = 400;
         return res.json({
@@ -142,8 +146,8 @@ class WebserverClass {
     // Clean device list and rescan
     router.get('/rescan', (req, res) => {
       logger.info('Clear current devicelist and rescan');
-      broadlink.discoverDevices();
-      res.json();
+      const isRunning = broadlink.discoverDevices();
+      res.json({ running: isRunning });
     });
 
 
@@ -175,6 +179,17 @@ class WebserverClass {
         // Send all devices
         _.each(broadlink.devicesInfo(), (device) => this.io.emit('device', device));
       }
+
+      // Trigger webhook
+      const url = config.settings.webhooks.scanCompleted;
+      if (!url) return;
+      request.get(url, (error) => {
+        if (error) {
+          logger.error('Webhook sent error');
+          return;
+        }
+        logger.info('Webhook sent successfully');
+      });
     });
 
     // a broadlink device is found
@@ -197,11 +212,13 @@ class WebserverClass {
     this.server.listen(config.settings.gui.port, () => {
       logger.debug(`GUI Web listen on port ${config.settings.gui.port}`);
       // Start to find devices
-      broadlink.discoverDevices();
-      // let someone know
-      this.io.emit('deviceScanEnable');
+      const isRunning = broadlink.discoverDevices();
+      if (isRunning) {
+        // let someone know
+        this.io.emit('deviceScanEnable');
+      }
       // loop actions
-      setInterval(this.loopPlay, 250);
+      setInterval(this.loopPlay, config.settings.queue.delay);
     });
   }
 }
@@ -344,7 +361,7 @@ const recordRFFrequence = (data) => new Promise((resolve, reject) => {
 
 recordAction = (action, data) => {
   if (config.isRunningRecording) {
-    logger.error('Already recording');
+    logger.error('Already recording.');
     Webserver.emitRecord('running');
     return;
   }

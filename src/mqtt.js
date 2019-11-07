@@ -39,16 +39,21 @@ class MQTT {
     this.client.on('error', (err) => {
       logger.error('MQTT Error', err);
     });
-    this.client.on('message', (topic, message) => {
-      // message is Buffer
+    this.client.on('message', (topic, message, packet) => {
+      // We dont want to run retained messages.
+      if (packet.retain) {
+        logger.debug(`packet is retained, block ${packet.topic}`);
+        return;
+      }
       const msg = message.toString();
       logger.debug(`MQTT Received Message topic: ${topic}, message: ${msg}`);
       this.emit('playCommand', topic, msg);
     });
   }
 
-  publish(topic, message) {
-    this.client.publish(topic, message);
+  publish(topic, message, callback) {
+    logger.debug(`MQTT Publish topic: ${topic}, message: ${message}`);
+    this.client.publish(topic, message, callback);
   }
 }
 util.inherits(MQTT, EventEmitter);

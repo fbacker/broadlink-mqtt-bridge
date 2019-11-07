@@ -9,13 +9,12 @@ import config from './config';
 class Broadlink {
   constructor() {
     this.loopTimeToFindDevices = 5;
-    this.discovering = false;
     this.broadlink = new BroadlinkJS();
 
     // network callback, device is found
     this.broadlink.on('deviceReady', (device) => {
       this.configureDevice(device);
-      logger.debug(
+      logger.info(
         `Device found model: ${device.host.model}, id: ${device.host.id}, ip: ${device.host.address}`,
       );
       this.emit('device', device);
@@ -81,8 +80,7 @@ class Broadlink {
   // We are finished, stop looking for devices
     if (count === 0) {
       this.emit('discoverCompleted', Object.keys(this.broadlink.devices).length);
-      // console.log("discoveredDevices", discoveredDevices);
-      this.discovering = false;
+      config.setIsRunningScan(false);
       return;
     }
 
@@ -101,11 +99,12 @@ class Broadlink {
 
   // EXPORTED; Run to find devices
   discoverDevices() {
-    if (this.discovering) return;
-    this.discovering = true;
+    if (config.isPlayBlocked()) return false;
+    config.setIsRunningScan(true);
     // clear
     this.broadlink.devices = {};
     this.discoverDevicesLoop(this.loopTimeToFindDevices);
+    return true;
   }
 }
 util.inherits(Broadlink, EventEmitter);

@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node -r esm index.js",
-    "dev": "nodemon -r esm --inspect index.js localhost 3000",
+    "development": "nodemon -r esm --inspect index.js localhost 3000",
     "logs": "frontail --port 3001 --disable-usage-stats output.log",
     "production": "concurrently \"npm run start\" \"npm run logs\""
   },
@@ -22,6 +22,7 @@
     "md5": "^2.2.1",
     "md5-file": "^4.0.0",
     "mqtt": "^3.0.0",
+    "request": "^2.88.0",
     "shelljs": "^0.8.3",
     "socket.io": "^2.3.0",
     "winston": "^3.2.1"

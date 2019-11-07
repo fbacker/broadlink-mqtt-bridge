@@ -3,10 +3,10 @@ import logger from '../logger';
 import config from '../config';
 
 const playCommand = () => new Promise((resolve, reject) => {
-  if (config.queue.length !== 0 && !config.isRunningRecording) {
+  if (config.queue.length !== 0 && !config.isPlayBlocked()) {
     const data = config.queue.shift();
     logger.info(
-      `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}`,
+      `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}`,
     );
     fs.readFile(data.filePath, (err, fileData) => {
       if (err) {
