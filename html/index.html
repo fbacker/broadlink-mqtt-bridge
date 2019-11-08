@@ -183,33 +183,26 @@
                 />
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-sm-2"></div>
-              <div class="col">
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-sm"
-                  id="btnRecordIR"
-                >
-                  <i class="fas fa-microphone-alt"></i> Record IR
-                </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-sm"
-                  id="btnRecordRF"
-                >
-                  <i class="fas fa-broadcast-tower"></i> Record RF
-                </button>
-                <button type="submit" class="btn btn-info btn-sm" id="btnPlay">
-                  <i class="far fa-play-circle"></i> Play
-                </button>
-              </div>
-            </div>
+            <button type="submit" class="hidden"></button>
           </form>
-          <button type="submit" class="btn btn-warning btn-sm" id="btnBlock">
-            <span class="label"></span>
-          </button>
+
+          <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col">
+              <button class="btn btn-primary btn-sm btn-form" id="btnRecordIR">
+                <i class="fas fa-microphone-alt"></i> Record IR
+              </button>
+              <button class="btn btn-primary btn-sm btn-form" id="btnRecordRF">
+                <i class="fas fa-broadcast-tower"></i> Record RF
+              </button>
+              <button class="btn btn-info btn-sm btn-form" id="btnPlay">
+                <i class="far fa-play-circle"></i> Play
+              </button>
+              <button class="btn btn-warning btn-sm" id="btnBlock">
+                <span class="label"></span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -281,7 +274,7 @@
 
         // Is running commands blocked
         socket.on("blocked", msg => {
-          blockRunning = msg;
+          blockRunning = JSON.parse(msg);
           const label = blockRunning ? "Unblock Play" : "Block Play";
           $("#btnBlock > .label").text(label);
         });
@@ -371,6 +364,7 @@
             });
           }
         });
+
         $("#btnBlock").click(e => {
           blockRunning = !blockRunning;
           $.ajax({
@@ -379,57 +373,61 @@
             data: { block: blockRunning }
           });
         });
+
         $("#btnLogFullscreen").click(e => {
           const url = `http://${window.location.hostname}:${config.gui.logs}`;
           window.open(url);
         });
-        $("form button[type=submit]").click(e => {
-          $("button[type=submit]", $(this)).removeAttr("clicked");
+        $("form .btn-form").click(e => {
+          $(".btn-form", $(this)).removeAttr("clicked");
           $(e.currentTarget).attr("clicked", "true");
         });
+
         $("#formPublish").submit(e => {
           e.preventDefault();
-          if (config === null) {
-            alert("Config is missing. It hasn't been loaded yet");
-            return;
-          }
+          return false;
 
-          var action = $("#formPublish button[type=submit][clicked=true]")
-            .attr("id")
-            .toLowerCase()
-            .substr(3);
-          const topic = $("#inputTopic").val();
-          const message = $("#inputMessage").val();
-          const device = $("#inputDevice").val();
-          let type;
-          switch (action) {
-            case "recordir":
-            case "recordrf":
-              type = action.substr(-2);
-              action = "record";
-              if (device === "") {
-                // we need a specific device to record
-                alert(
-                  "You need to select a specific device to make an recording"
-                );
-                return;
-              }
-              break;
-          }
+          // if (config === null) {
+          //   alert("Config is missing. It hasn't been loaded yet");
+          //   return;
+          // }
 
-          $("html, body").animate({ scrollTop: 0 }, "slow");
-          $.ajax({
-            type: "POST",
-            url: `/api/${action}`,
-            data: { topic, message, device, type },
-            success: json => {
-              alert(json.message);
-              loadTreeData(topic, message);
-            },
-            error: err => {
-              alert(err.responseJSON.message);
-            }
-          });
+          // var action = $("#formPublish .btn-form[clicked=true]")
+          //   .attr("id")
+          //   .toLowerCase()
+          //   .substr(3);
+          // const topic = $("#inputTopic").val();
+          // const message = $("#inputMessage").val();
+          // const device = $("#inputDevice").val();
+          // let type;
+          // switch (action) {
+          //   case "recordir":
+          //   case "recordrf":
+          //     type = action.substr(-2);
+          //     action = "record";
+          //     if (device === "") {
+          //       // we need a specific device to record
+          //       alert(
+          //         "You need to select a specific device to make an recording"
+          //       );
+          //       return;
+          //     }
+          //     break;
+          // }
+
+          // $("html, body").animate({ scrollTop: 0 }, "slow");
+          // $.ajax({
+          //   type: "POST",
+          //   url: `/api/${action}`,
+          //   data: { topic, message, device, type },
+          //   success: json => {
+          //     alert(json.message);
+          //     loadTreeData(topic, message);
+          //   },
+          //   error: err => {
+          //     alert(err.responseJSON.message);
+          //   }
+          // });
         });
 
         let hashList = [];

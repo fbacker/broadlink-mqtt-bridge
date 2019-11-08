@@ -158,14 +158,12 @@ class WebserverClass {
 
     // Block play calls
     router.post('/block', (req, res) => {
-      const {
-        block,
-      } = req.body;
+      const block = JSON.parse(req.body.block.toLowerCase());
       logger.info(`Block play calls unless from GUI: ${block}`);
       config.setIsRunningBlocked(block);
       this.io.emit('blocked', config.isRunningBlocked);
       if (!block) config.clearUnblockedQueue();
-      res.json();
+      res.json({ happy: true });
     });
 
 
