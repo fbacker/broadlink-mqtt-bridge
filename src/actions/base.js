@@ -1,5 +1,6 @@
 import path from 'path';
 import _ from 'lodash';
+import md5 from 'md5';
 import broadlink from '../broadlink';
 import logger from '../logger';
 import config from '../config';
@@ -19,6 +20,7 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
   const actionPath = data.topic.substr(config.settings.mqtt.subscribeBasePath.length);
   const filePath = `${path.join(config.commandsPath, actionPath, data.message)}.bin`;
   const folderPath = filePath.substr(0, filePath.lastIndexOf('/'));
+  const hash = md5(filePath);
 
   // find device to use
   const devices = broadlink.devices();
@@ -37,9 +39,10 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
 
   data = {
     ...data,
-    path: actionPath,
     folderPath,
     filePath,
+    hash,
+    path: actionPath,
     deviceModule: device,
   };
   logger.info(`Prepare topic: ${data.topic}, message: ${data.message}`);
@@ -48,6 +51,10 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
 
 // Add to play queue, run when possible
 const addToQueue = (data) => new Promise((resolve) => {
+  // Does command already exist, remove it so we only send the latest
+  const index = _.findIndex(config.queue, (o) => o.hash === data.hash);
+  if (index !== -1) config.queue.splice(index, 1);
+
   config.addItemToQue(data);
   resolve();
 });

@@ -207,6 +207,9 @@
               </div>
             </div>
           </form>
+          <button type="submit" class="btn btn-warning btn-sm" id="btnBlock">
+            <span class="label"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -246,6 +249,7 @@
         var config = null;
         var socket = io();
         var selectedNode = null;
+        var blockRunning;
 
         $("#success-config").hide();
         $("#progressScanning").hide();
@@ -275,6 +279,13 @@
           setup();
         });
 
+        // Is running commands blocked
+        socket.on("blocked", msg => {
+          blockRunning = msg;
+          const label = blockRunning ? "Unblock Play" : "Block Play";
+          $("#btnBlock > .label").text(label);
+        });
+
         socket.on("record", (type, label, progress) => {
           if (type === "running") {
             alert("Recording is already running");
@@ -302,7 +313,6 @@
         });
 
         socket.on("device", msg => {
-          console.log("device", msg);
           $("#listDevicesNoDevice").remove(); // remove tmp text
           var e = $(`#${msg.id}`);
           if (e.length === 0) {
@@ -360,6 +370,14 @@
               }
             });
           }
+        });
+        $("#btnBlock").click(e => {
+          blockRunning = !blockRunning;
+          $.ajax({
+            type: "POST",
+            url: `/api/block`,
+            data: { block: blockRunning }
+          });
         });
         $("#btnLogFullscreen").click(e => {
           const url = `http://${window.location.hostname}:${config.gui.logs}`;

@@ -41,6 +41,7 @@ class WebserverClass {
       logger.debug('Web a client connected');
       // Send config
       this.io.emit('config', config.settings);
+      this.io.emit('blocked', config.isRunningBlocked);
       // Send all devices we have
       _.each(broadlink.devicesInfo(), (device) => io.emit('device', device));
       // web client disconnects
@@ -61,9 +62,14 @@ class WebserverClass {
     router.post('/play', (req, res) => {
       const { topic, message } = req.body;
       if (topic !== '' && message !== '') {
-        mqtt.publish(topic, message, () => {
-          logger.debug('Sent message to mqtt');
-          res.json({ message: 'Message sent to MQTT' });
+        prepareAction({ topic, message }).then((data) => {
+          // if running is blocked, make gui calls still possible
+          if (config.isRunningBlocked) config.addItemToUnblockedQueue(data);
+          // send to mqtt
+          mqtt.publish(data.topic, data.message, () => {
+            logger.debug('Sent message to mqtt');
+            res.json({ message: 'Message sent to MQTT' });
+          });
         });
       } else {
         res.statusCode = 400;
@@ -148,6 +154,18 @@ class WebserverClass {
       logger.info('Clear current devicelist and rescan');
       const isRunning = broadlink.discoverDevices();
       res.json({ running: isRunning });
+    });
+
+    // Block play calls
+    router.post('/block', (req, res) => {
+      const {
+        block,
+      } = req.body;
+      logger.info(`Block play calls unless from GUI: ${block}`);
+      config.setIsRunningBlocked(block);
+      this.io.emit('blocked', config.isRunningBlocked);
+      if (!block) config.clearUnblockedQueue();
+      res.json();
     });
 
 
