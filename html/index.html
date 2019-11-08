@@ -238,6 +238,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/jstree.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/jquery.md5.js"></script>
 
     <script>
       // click, set configMQTT before
@@ -405,7 +406,7 @@
             data: { topic, message, device, type },
             success: json => {
               alert(json.message);
-              loadTreeData();
+              loadTreeData(topic, message);
             },
             error: err => {
               alert(err.responseJSON.message);
@@ -425,13 +426,14 @@
               var node = this._model.data[node_id];
               var data = node && node.original ? node.original : null;
               if (data && data.type === "file") {
-                if (hashDuplicates.includes(data.hash)) {
-                  $(el)
-                    .find("a > i")
-                    .prepend(
-                      '<i class="fas fa-exclamation-triangle text-danger icon-duplicate"></i>'
-                    );
-                }
+                // @TODO, only copied files are marked as duplicates. Not same recorded signal
+                // if (hashDuplicates.includes(data.hash)) {
+                //   $(el)
+                //     .find("a > i")
+                //     .prepend(
+                //       '<i class="fas fa-exclamation-triangle text-danger icon-duplicate"></i>'
+                //     );
+                // }
               }
             }
             return el;
@@ -441,13 +443,18 @@
         // Look for duplicates of hashed files to display
         const deepLookForDuplicates = node => {
           if (node.type === "file") {
+            // md5 already exist
             if (hashList.includes(node.hash)) {
+              // we havn't added it to duplicate list yet
               if (!hashDuplicates.includes(node.hash)) {
                 hashDuplicates.push(node.hash);
               }
             }
+
+            // add md5 hash to list
             hashList.push(node.hash);
           }
+          // has children, recursive loop
           if (node.children) {
             for (let i = 0; i < node.children.length; i = i + 1) {
               deepLookForDuplicates(node.children[i]);
@@ -456,7 +463,7 @@
         };
 
         // Load files to populate the tree
-        const loadTreeData = () => {
+        const loadTreeData = (topic, message) => {
           $.ajax({
             url: "/api/files",
             success: function(data) {
@@ -465,6 +472,22 @@
               deepLookForDuplicates(data);
               data.state = { opened: true };
               $("#jstree").jstree(true).settings.core.data = data;
+              $("#jstree").one("refresh.jstree", () => {
+                if (topic && message) {
+                  // Select the item in tree
+                  const topicTrim = topic.substring(
+                    config.mqtt.subscribeBasePath.length
+                  );
+                  const path = `commands/${topicTrim}/${message}.bin`;
+                  const id = $.md5(path);
+                  $("#jstree")
+                    .jstree(true)
+                    .deselect_all(true);
+                  $("#jstree")
+                    .jstree(true)
+                    .select_node(id);
+                }
+              });
               $("#jstree")
                 .jstree(true)
                 .refresh();
