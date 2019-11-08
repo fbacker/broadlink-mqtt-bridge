@@ -183,26 +183,36 @@
                 />
               </div>
             </div>
-            <button type="submit" class="hidden"></button>
-          </form>
-
-          <div class="row">
-            <div class="col-sm-2"></div>
-            <div class="col">
-              <button class="btn btn-primary btn-sm btn-form" id="btnRecordIR">
-                <i class="fas fa-microphone-alt"></i> Record IR
-              </button>
-              <button class="btn btn-primary btn-sm btn-form" id="btnRecordRF">
-                <i class="fas fa-broadcast-tower"></i> Record RF
-              </button>
-              <button class="btn btn-info btn-sm btn-form" id="btnPlay">
-                <i class="far fa-play-circle"></i> Play
-              </button>
-              <button class="btn btn-warning btn-sm" id="btnBlock">
-                <span class="label"></span>
-              </button>
+            <div class="row">
+              <div class="col-sm-2"></div>
+              <div class="col">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm "
+                  id="btnRecordIR"
+                >
+                  <i class="fas fa-microphone-alt"></i> Record IR
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm "
+                  id="btnRecordRF"
+                >
+                  <i class="fas fa-broadcast-tower"></i> Record RF
+                </button>
+                <button type="submit" class="btn btn-info btn-sm " id="btnPlay">
+                  <i class="far fa-play-circle"></i> Play
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-warning btn-sm"
+                  id="btnBlock"
+                >
+                  <span class="label"></span>
+                </button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
@@ -232,9 +242,8 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/jstree.min.js"></script>
-
+    <script src="https://cdn.rawgit.com/placemarker/jQuery-MD5/master/jquery.md5.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/jquery.md5.js"></script>
 
     <script>
       // click, set configMQTT before
@@ -365,69 +374,69 @@
           }
         });
 
-        $("#btnBlock").click(e => {
-          blockRunning = !blockRunning;
-          $.ajax({
-            type: "POST",
-            url: `/api/block`,
-            data: { block: blockRunning }
-          });
-        });
-
         $("#btnLogFullscreen").click(e => {
           const url = `http://${window.location.hostname}:${config.gui.logs}`;
           window.open(url);
         });
-        $("form .btn-form").click(e => {
-          $(".btn-form", $(this)).removeAttr("clicked");
+        $("form button").click(e => {
+          $("button", $(this)).removeAttr("clicked");
           $(e.currentTarget).attr("clicked", "true");
         });
 
         $("#formPublish").submit(e => {
           e.preventDefault();
-          return false;
 
-          // if (config === null) {
-          //   alert("Config is missing. It hasn't been loaded yet");
-          //   return;
-          // }
+          if (config === null) {
+            alert("Config is missing. It hasn't been loaded yet");
+            return;
+          }
 
-          // var action = $("#formPublish .btn-form[clicked=true]")
-          //   .attr("id")
-          //   .toLowerCase()
-          //   .substr(3);
-          // const topic = $("#inputTopic").val();
-          // const message = $("#inputMessage").val();
-          // const device = $("#inputDevice").val();
-          // let type;
-          // switch (action) {
-          //   case "recordir":
-          //   case "recordrf":
-          //     type = action.substr(-2);
-          //     action = "record";
-          //     if (device === "") {
-          //       // we need a specific device to record
-          //       alert(
-          //         "You need to select a specific device to make an recording"
-          //       );
-          //       return;
-          //     }
-          //     break;
-          // }
+          var action = $("#formPublish button[clicked=true]")
+            .attr("id")
+            .toLowerCase()
+            .substr(3);
 
-          // $("html, body").animate({ scrollTop: 0 }, "slow");
-          // $.ajax({
-          //   type: "POST",
-          //   url: `/api/${action}`,
-          //   data: { topic, message, device, type },
-          //   success: json => {
-          //     alert(json.message);
-          //     loadTreeData(topic, message);
-          //   },
-          //   error: err => {
-          //     alert(err.responseJSON.message);
-          //   }
-          // });
+          const topic = $("#inputTopic").val();
+          const message = $("#inputMessage").val();
+          const device = $("#inputDevice").val();
+          let type;
+          switch (action) {
+            case "block":
+              blockRunning = !blockRunning;
+              $.ajax({
+                type: "POST",
+                url: `/api/block`,
+                data: { block: blockRunning }
+              });
+              return;
+
+            case "recordir":
+            case "recordrf":
+              type = action.substr(-2);
+              action = "record";
+              if (device === "") {
+                // we need a specific device to record
+                alert(
+                  "You need to select a specific device to make an recording"
+                );
+                return;
+              }
+              break;
+          }
+
+          $("html, body").animate({ scrollTop: 0 }, "slow");
+          $.ajax({
+            type: "POST",
+            url: `/api/${action}`,
+            data: { topic, message, device, type },
+            success: json => {
+              alert(json.message);
+              loadTreeData(topic, message);
+            },
+            error: err => {
+              alert(err.responseJSON.message);
+            }
+          });
         });
 
         let hashList = [];
