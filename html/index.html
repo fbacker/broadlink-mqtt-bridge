@@ -212,6 +212,12 @@
                 </button>
               </div>
             </div>
+            <div class="row" id="msgSent">
+              <div class="col-sm-2"></div>
+              <div class="col text-success">
+                Message sent
+              </div>
+            </div>
           </form>
         </div>
       </div>
@@ -256,6 +262,7 @@
         $("#success-config").hide();
         $("#progressScanning").hide();
         $("#progressRecording").hide();
+        $("#msgSent").hide();
 
         const setup = () => {
           // set logs in iframe url
@@ -430,8 +437,16 @@
             url: `/api/${action}`,
             data: { topic, message, device, type },
             success: json => {
-              alert(json.message);
-              loadTreeData(topic, message);
+              if (action == "play") {
+                $("#msgSent")
+                  .fadeTo(1000, 500)
+                  .slideUp(500, () => {
+                    $("#msgSent").slideUp(500);
+                  });
+              } else {
+                alert(json.message);
+                loadTreeData(topic, message);
+              }
             },
             error: err => {
               alert(err.responseJSON.message);
