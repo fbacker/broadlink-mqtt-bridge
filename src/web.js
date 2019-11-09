@@ -243,7 +243,7 @@ const Webserver = new WebserverClass();
 
 // learn ir
 const deviceEnterLearningIR = (data) => new Promise((resolve) => {
-  Webserver.emitRecord(data.type, '', 0);
+  Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceEnterLearningIR');
   data.deviceModule.enterLearning();
   resolve(data);
@@ -251,6 +251,7 @@ const deviceEnterLearningIR = (data) => new Promise((resolve) => {
 
 // Stops ir
 const deviceExitLearningIR = (data) => new Promise((resolve) => {
+  Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceExitLearningIR');
   data.deviceModule.cancelLearn();
   resolve(data);
@@ -258,7 +259,7 @@ const deviceExitLearningIR = (data) => new Promise((resolve) => {
 
 // rf sweep frq
 const deviceEnterLearningRFSweep = (data) => new Promise((resolve) => {
-  Webserver.emitRecord('rf', '', 0);
+  Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceEnterLearningRFSweep');
   data.deviceModule.enterRFSweep();
   resolve(data);
@@ -271,6 +272,7 @@ const deviceEnterLearningRFSweep = (data) => new Promise((resolve) => {
 // });
 // stops rf
 const deviceExitLearningRF = (data) => new Promise((resolve) => {
+  Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceExitLearningRF');
   data.deviceModule.cancelLearn();
   resolve(data);
