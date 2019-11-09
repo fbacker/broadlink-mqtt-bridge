@@ -14,7 +14,7 @@ const playCommand = () => new Promise((resolve, reject) => {
       if (index !== -1) {
         config.unblocked.splice(index, 1);
       } else {
-        logger.info(`Blocked call topic: ${data.topic}, message: ${data.message}`);
+        logger.error(`Blocked call topic: ${data.topic}, message: ${data.message}`);
         return;
       }
     }

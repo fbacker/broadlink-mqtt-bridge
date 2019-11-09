@@ -62,7 +62,7 @@ class WebserverClass {
     router.post('/play', (req, res) => {
       const { topic, message } = req.body;
       if (topic !== '' && message !== '') {
-        prepareAction({ topic, message }).then((data) => {
+        prepareAction({ topic, message, disableLog: true }).then((data) => {
           // if running is blocked, make gui calls still possible
           if (config.isRunningBlocked) config.addItemToUnblockedQueue(data);
           // send to mqtt

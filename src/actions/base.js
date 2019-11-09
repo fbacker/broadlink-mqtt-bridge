@@ -45,7 +45,7 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
     path: actionPath,
     deviceModule: device,
   };
-  logger.info(`Prepare topic: ${data.topic}, message: ${data.message}`);
+  if (!data.disableLog) logger.info(`Prepare topic: ${data.topic}, message: ${data.message}`);
   return resolve(data);
 });
 
