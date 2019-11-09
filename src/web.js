@@ -288,8 +288,10 @@ const recordIR = (data) => new Promise((resolve, reject) => {
   const interval = setInterval(() => {
     const step = config.settings.recording.timeout.ir - timeout;
     const progress = (step / config.settings.recording.timeout.ir) * 100;
-    Webserver.emitRecord(data.type, 'Press a button', progress);
-    logger.debug(`record: Timeout in ${timeout}`);
+    if (step > 0) {
+      Webserver.emitRecord(data.type, 'Press a button', progress);
+    }
+    logger.debug(`recordIR: Timeout in ${timeout}, step: ${step}, progress: ${progress}`);
     data.deviceModule.checkData();
     timeout -= intervalSpeed;
     if (timeout <= 0) {
@@ -319,10 +321,12 @@ const recordRFCode = (data) => new Promise((resolve, reject) => {
     let timeout = config.settings.recording.timeout.rf;
     const intervalSpeed = 1;
     const interval = setInterval(() => {
-    //   logger.info(`recordRFCode: Timeout in ${timeout}`);
       const step = config.settings.recording.timeout.rf - timeout;
       const progress = (step / config.settings.recording.timeout.rf) * 100;
-      Webserver.emitRecord('rf', 'Press RF button', progress);
+      logger.debug(`recordRFCode: Timeout in ${timeout}, step: ${step}, progress: ${progress}`);
+      if (step > 0) {
+        Webserver.emitRecord('rf', 'Press RF button', progress);
+      }
       data.deviceModule.checkData();
       timeout -= intervalSpeed;
       if (timeout <= 0) {
@@ -353,8 +357,10 @@ const recordRFFrequence = (data) => new Promise((resolve, reject) => {
   const interval = setInterval(() => {
     const step = config.settings.recording.timeout.rf - timeout;
     const progress = (step / config.settings.recording.timeout.rf) * 100;
-    Webserver.emitRecord('rf', 'Hold RF button', progress);
-    logger.debug(`recordRFFrequence: Timeout in ${timeout}`);
+    if (step > 0) {
+      Webserver.emitRecord('rf', 'Hold RF button', progress);
+    }
+    logger.debug(`recordRFFrequence: Timeout in ${timeout}, step: ${step}, progress: ${progress}`);
     data.deviceModule.checkRFData();
     timeout -= intervalSpeed;
     if (timeout <= 0) {
