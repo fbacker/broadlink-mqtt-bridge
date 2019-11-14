@@ -4,7 +4,7 @@ This one is built specifically with OpenHAB on a Raspberry PI in mind. However i
 
 It has a Admin GUI for helping record IR / RF signals. You will be able with the filetree see all recorded actions, delete actions and if a disclamation mark occures, this means that the action is a duplicate of another (has same binary content).
 
-![admin gui](https://github.com/fbacker/broadlink-mqtt-bridge.wiki/raw/master/img/gui.png)
+![admin gui](https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bridge/master/github/gui.png)
 
 ## Requirements
 
