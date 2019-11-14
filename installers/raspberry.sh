@@ -80,7 +80,7 @@ if [ -d "./broadlink-mqtt-bridge" ] ; then
 	git reset --hard
     if git pull; then 
         echo -e "\e[92mUpgrade Done!\e[0m"
-		npm install
+		npm install --production
 		sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
 		sudo chmod +x /etc/systemd/system/broadlinkbridge.service
 		sudo systemctl daemon-reload
@@ -104,7 +104,7 @@ fi
 
 cd /srv/openhab2-conf/broadlink-mqtt-bridge  || exit
 echo -e "\e[96mInstalling dependencies ...\e[90m"
-if npm install; then 
+if npm install --production; then 
 	echo -e "\e[92mDependencies installation Done!\e[0m"
 else
 	echo -e "\e[91mUnable to install dependencies!"
