@@ -2,6 +2,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import logger from '../logger';
 import config from '../config';
+import broadlink from '../broadlink';
 
 const playCommand = () => new Promise((resolve, reject) => {
   if (config.queue.length !== 0) {
@@ -33,13 +34,12 @@ const playCommand = () => new Promise((resolve, reject) => {
 });
 
 const queryTemperatureCommand = (data) => new Promise((resolve, reject) => {
-  logger.info('queryTemperature');
+  logger.info('ask for temperature');
   try {
-    data.deviceModule.checkTemperature();
+    _.each(broadlink.devices(), (device) => device.checkTemperature());
     resolve(data);
   } catch (error) {
-    logger.error('Failed to query temperature');
-    reject(new Error('Stopped at queryTemperature'));
+    reject(new Error(`Failed to query temperature ${error}`));
   }
 });
 

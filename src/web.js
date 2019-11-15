@@ -11,7 +11,7 @@ import config from './config';
 import logger from './logger';
 import { prepareAction, addToQueue } from './actions/base';
 import { fileDelete, fileListStructure, fileSave } from './actions/files';
-import { playCommand } from './actions/play';
+import { playCommand, queryTemperatureCommand } from './actions/play';
 
 let recordAction;
 // -------------------------------------
@@ -110,6 +110,15 @@ class WebserverClass {
       }
     });
 
+    router.get('/temperature', (req, res) => {
+      queryTemperatureCommand().then(() => {
+        res.json({ message: 'yes' });
+      }).catch(() => {
+        res.statusCode = 400;
+        res.json({ message: 'Failed to request temperature.' });
+      });
+    });
+
     // Get all command files
     router.get('/files', (req, res) => {
       fileListStructure('./commands')
@@ -183,6 +192,11 @@ class WebserverClass {
     // send mqtt
     broadlink.on('publish-mqtt', (topic, message) => {
       mqtt.publish(topic, message);
+    });
+
+    // internal temperature response
+    broadlink.on('temperature', (device, temperature) => {
+      this.io.emit('temperature', device, temperature);
     });
 
     // after a while this is triggered
@@ -439,9 +453,6 @@ recordAction = (action, data) => {
           throw Error(err);
         });
 
-
-      // case 'temperature':
-      //   return prepareAction(data).then(queryTemperature);
     default:
       return new Promise((resolve, reject) => {
         reject(new Error(`Action ${action} doesn't exists`));

@@ -203,13 +203,6 @@
                 <button type="submit" class="btn btn-info btn-sm " id="btnPlay">
                   <i class="far fa-play-circle"></i> Play
                 </button>
-                <button
-                  type="submit"
-                  class="btn btn-warning btn-sm"
-                  id="btnBlock"
-                >
-                  <span class="label"></span>
-                </button>
               </div>
             </div>
             <div class="row" id="msgSent">
@@ -219,6 +212,25 @@
               </div>
             </div>
           </form>
+          <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col">
+              <button
+                type="submit"
+                class="btn btn-warning btn-sm"
+                id="btnBlock"
+              >
+                <span class="label"></span>
+              </button>
+              <button
+                type="submit"
+                class="btn btn-success btn-sm"
+                id="btnTemperature"
+              >
+                Get devices temperatures
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -286,6 +298,11 @@
         socket.on("config", msg => {
           config = msg;
           setup();
+        });
+
+        // Internal temperature response
+        socket.on("temperature", (device, temperature) => {
+          alert(`Device ${device} has temperature ${temperature}`);
         });
 
         // Is running commands blocked
@@ -389,6 +406,26 @@
           $("button", $(this)).removeAttr("clicked");
           $(e.currentTarget).attr("clicked", "true");
         });
+        $("#btnBlock").click(e => {
+          blockRunning = !blockRunning;
+          $.ajax({
+            type: "POST",
+            url: `/api/block`,
+            data: { block: blockRunning }
+          });
+        });
+        $("#btnTemperature").click(e => {
+          $.ajax({
+            type: "GET",
+            url: `/api/temperature`,
+            success: json => {
+              alert(json.message);
+            },
+            error: err => {
+              alert(err.responseJSON.message);
+            }
+          });
+        });
 
         $("#formPublish").submit(e => {
           e.preventDefault();
@@ -408,15 +445,6 @@
           const device = $("#inputDevice").val();
           let type;
           switch (action) {
-            case "block":
-              blockRunning = !blockRunning;
-              $.ajax({
-                type: "POST",
-                url: `/api/block`,
-                data: { block: blockRunning }
-              });
-              return;
-
             case "recordir":
             case "recordrf":
               type = action.substr(-2);

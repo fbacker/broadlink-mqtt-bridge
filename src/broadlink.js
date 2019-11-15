@@ -37,34 +37,14 @@ class Broadlink {
     device.on('temperature', (temperature) => {
       logger.debug(`Broadlink Temperature ${temperature} on ${device.host.id}`);
       try {
-      // @TODO, change -stat to statistics/ ???
-        this.emit('publish-mqtt', `${config.settings.mqtt.subscribeBasePath}-stat/${device.host.id}/temperature`, temperature.toString());
-        // mqtt.publish(
-        //   `${mqtt.options.subscribeBasePath}-stat/${device.host.id}/temperature`,
-        //   temperature.toString(),
-        // );
+        // We got temperature, publish to
+        // broadlink/internal/temperature/{device-id}
+        this.emit('publish-mqtt', `${config.settings.mqtt.subscribeBasePath}internal/temperature/${device.host.id}`, temperature.toString());
+        this.emit('temperature', device.host.id, temperature.toString());
       } catch (error) {
         logger.error('Temperature publish error', error);
       }
     });
-  /*
-  // IR or RF signal found
-  device.on("rawData", data => {
-    logger.debug("Broadlink RAW");
-    //recordSave(data);
-    //recordCancel();
-  });
-  // RF Sweep found something
-  device.on("rawRFData", temp => {
-    logger.debug("Broadlink RAW RF");
-    recordMode = recordModeEnum.RecordRFSignal;
-  });
-  // Don't really know
-  device.on("rawRFData2", temp => {
-    logger.debug("Broadlink RAW 2");
-    recordCancel();
-  });
-  */
   }
 
   deviceFillInfo(device) {
