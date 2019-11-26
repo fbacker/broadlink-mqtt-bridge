@@ -13,7 +13,7 @@
     "body-parser": "^1.19.0",
     "broadlinkjs-rm": "git+https://github.com/fbacker/broadlinkjs-rm",
     "concurrently": "^5.0.0",
-    "config": "^3.2.3",
+    "config": "^3.2.4",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "flatted": "^2.0.1",
@@ -28,9 +28,9 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "eslint": "^6.6.0",
+    "eslint": "^6.7.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
-    "nodemon": "^1.19.4"
+    "nodemon": "^2.0.1"
   }
 }
