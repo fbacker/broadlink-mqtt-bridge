@@ -33,6 +33,7 @@ class WebserverClass {
     this.configureBroadlink();
     this.configureMQTT();
     app.use('/api', this.configureRouter(express.Router()));
+    this.checkIntervalDevices = null;
   }
 
   configureSocket(io) {
@@ -252,6 +253,23 @@ class WebserverClass {
       // loop actions
       setInterval(this.loopPlay, config.settings.queue.delay);
     });
+    this.checkIntervalDevices = setInterval(() => this.broadlinkCheckForDevices(), 60000);
+  }
+
+  broadlinkCheckForDevices() {
+    const devices = broadlink.devices();
+    const numOfDevices = Object.keys(devices).length;
+    logger.debug(`Check if we have any devices: ${numOfDevices} found.`);
+    if (numOfDevices === 0) {
+      logger.info('Try to find broadlink devices');
+      const isRunning = broadlink.discoverDevices();
+      if (isRunning) {
+        // let someone know
+        this.io.emit('deviceScanEnable');
+      }
+    } else {
+      clearInterval(this.checkIntervalDevices);
+    }
   }
 }
 const Webserver = new WebserverClass();
