@@ -23,9 +23,9 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
   let device = null;
 
   // broadcasting wants to use specific device
-  if (data.message.indexOf(':') !== -1) {
-    device = data.message.substr(data.message.indexOf(':') + 1);
-    data.message = data.message.substr(0, data.message.indexOf(':'));
+  if (data.topic.indexOf(':') !== -1) {
+    device = data.topic.substr(data.topic.indexOf(':') + 1);
+    data.topic = data.topic.substr(0, data.topic.indexOf(':'));
   } else if (data.device) {
     device = data.device;
     delete data.device;
