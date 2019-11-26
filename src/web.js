@@ -56,6 +56,10 @@ class WebserverClass {
     mqtt.on('playCommand', (topic, message) => {
       prepareAction({ topic, message }).then(addToQueue).catch((err) => logger.error(`MQTT failed on message '${err}'`));
     });
+
+    mqtt.on('playTemperature', () => {
+      queryTemperatureCommand();
+    });
   }
 
   configureRouter(router) {

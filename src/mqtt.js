@@ -47,7 +47,19 @@ class MQTT {
       }
       const msg = message.toString();
       logger.debug(`MQTT Received Message topic: ${topic}, message: ${msg}`);
-      this.emit('playCommand', topic, msg);
+
+      if (topic === `${this.options.subscribeBasePath}internal`) {
+        switch (msg.toLowerCase()) {
+          case 'temperature':
+            this.emit('playTemperature');
+            break;
+          default:
+            logger.warn(`Internal function ${msg} doesn't exist.`);
+            break;
+        }
+      } else {
+        this.emit('playCommand', topic, msg);
+      }
     });
   }
 
