@@ -15,26 +15,31 @@ const playCommand = () => new Promise((resolve, reject) => {
       if (index !== -1) {
         config.unblocked.splice(index, 1);
       } else {
-        logger.error(`Blocked call topic: ${data.topic}, message: ${data.message}`);
+        logger.error(
+          `Blocked call topic: ${data.topic}, message: ${data.message}`,
+        );
         return;
       }
     }
 
-    logger.info(
-      `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}`,
-    );
+
     fs.readFile(data.filePath, (err, fileData) => {
       if (err) {
         return reject(new Error(`Failed to find file: ${data.filePath}`));
       }
-      data.deviceModule.sendData(fileData, false);
+      _.each(data.deviceModules, (deviceItem) => {
+        logger.info(
+          `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}, device: ${deviceItem.mac}`,
+        );
+        deviceItem.sendData(fileData, false);
+      });
       resolve(data);
     });
   }
 });
 
 const queryTemperatureCommand = (data) => new Promise((resolve, reject) => {
-  logger.info('ask for temperature');
+  logger.info('Ask for temperatures.');
   try {
     _.each(broadlink.devices(), (device) => device.checkTemperature());
     resolve(data);
