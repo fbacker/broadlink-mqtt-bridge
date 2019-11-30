@@ -313,10 +313,7 @@
         });
 
         socket.on("record", (type, label, progress) => {
-          if (type === "running") {
-            alert("Recording is already running");
-            return;
-          }
+   
           if (label === "exit") {
             $("#progressRecordingBar").css("width", `100%`);
             setTimeout(() => $("#progressRecording").hide(), 500);

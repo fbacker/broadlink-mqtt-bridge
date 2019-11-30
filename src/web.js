@@ -92,6 +92,22 @@ class WebserverClass {
       const {
         topic, message, device, type,
       } = req.body;
+      logger.debug(`Start to record block rec: ${config.isRunningRecording}, block scan ${config.isRunningScan}`);
+      if (config.isRunningRecording) {
+        logger.error('Recording is already running.');
+        res.statusCode = 500;
+        return res.json({
+          message: 'Recording is already running.',
+        });
+      }
+      if (config.isRunningScan) {
+        logger.error('Wait until scan is completed before recording.');
+        res.statusCode = 500;
+        return res.json({
+          message: 'Wait until scan is completed before recording.',
+        });
+      }
+
       if (topic !== '' && message !== '' && device !== '' && type !== '') {
         logger.debug(`Start to record ${type}, action ${topic}`);
         recordAction(type, {
@@ -104,7 +120,7 @@ class WebserverClass {
           .catch((err) => {
             res.statusCode = 500;
             return res.json({
-              message: `Recording failed for for ${req.body.topic}`,
+              message: `Recording failed for for ${req.body.topic}, please se log.`,
               errors: [`Failed ${err}`],
               err,
             });
@@ -283,7 +299,7 @@ const Webserver = new WebserverClass();
 const deviceEnterLearningIR = (data) => new Promise((resolve) => {
   Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceEnterLearningIR');
-  data.deviceModule.enterLearning();
+  data.deviceModules[0].enterLearning();
   resolve(data);
 });
 
@@ -291,7 +307,7 @@ const deviceEnterLearningIR = (data) => new Promise((resolve) => {
 const deviceExitLearningIR = (data) => new Promise((resolve) => {
   Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceExitLearningIR');
-  data.deviceModule.cancelLearn();
+  data.deviceModules[0].cancelLearn();
   resolve(data);
 });
 
@@ -299,20 +315,20 @@ const deviceExitLearningIR = (data) => new Promise((resolve) => {
 const deviceEnterLearningRFSweep = (data) => new Promise((resolve) => {
   Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceEnterLearningRFSweep');
-  data.deviceModule.enterRFSweep();
+  data.deviceModules[0].enterRFSweep();
   resolve(data);
 });
 // enter rf learning
 // const deviceEnterLearningRF = (data) => new Promise((resolve) => {
 //   logger.debug('deviceEnterLearningRF');
-//   data.deviceModule.enterLearning();
+//   data.deviceModules[0].enterLearning();
 //   resolve(data);
 // });
 // stops rf
 const deviceExitLearningRF = (data) => new Promise((resolve) => {
   Webserver.emitRecord(data.type, 'Wait', 0);
   logger.debug('deviceExitLearningRF');
-  data.deviceModule.cancelLearn();
+  data.deviceModules[0].cancelLearn();
   resolve(data);
 });
 
@@ -330,7 +346,7 @@ const recordIR = (data) => new Promise((resolve, reject) => {
       Webserver.emitRecord(data.type, 'Press a button', progress);
     }
     logger.debug(`recordIR: Timeout in ${timeout}, step: ${step}, progress: ${progress}`);
-    data.deviceModule.checkData();
+    data.deviceModules[0].checkData();
     timeout -= intervalSpeed;
     if (timeout <= 0) {
       clearInterval(interval);
@@ -344,12 +360,12 @@ const recordIR = (data) => new Promise((resolve, reject) => {
     clearInterval(interval);
     Webserver.emitRecord(data.type, 'Release');
     logger.debug('Broadlink IR RAW');
-    data.deviceModule.removeListener('rawData', callback);
+    data.deviceModules[0].removeListener('rawData', callback);
     data.signal = dataRaw;
 
     setTimeout(() => resolve(data), 1000);
   };
-  data.deviceModule.on('rawData', callback);
+  data.deviceModules[0].on('rawData', callback);
 });
 
 // Record RF Signal (after a frequence is found)
@@ -365,7 +381,7 @@ const recordRFCode = (data) => new Promise((resolve, reject) => {
       if (step > 0) {
         Webserver.emitRecord('rf', 'Press RF button', progress);
       }
-      data.deviceModule.checkData();
+      data.deviceModules[0].checkData();
       timeout -= intervalSpeed;
       if (timeout <= 0) {
         clearInterval(interval);
@@ -380,10 +396,10 @@ const recordRFCode = (data) => new Promise((resolve, reject) => {
       Webserver.emitRecord(data.type, 'Release');
       data.signal = dataRaw;
       clearInterval(interval);
-      data.deviceModule.removeListener('rawData', callback);
+      data.deviceModules[0].removeListener('rawData', callback);
       setTimeout(() => resolve(data), 1000);
     };
-    data.deviceModule.on('rawData', callback);
+    data.deviceModules[0].on('rawData', callback);
   }, 3000);
 });
 
@@ -399,7 +415,7 @@ const recordRFFrequence = (data) => new Promise((resolve, reject) => {
       Webserver.emitRecord('rf', 'Hold RF button', progress);
     }
     logger.debug(`recordRFFrequence: Timeout in ${timeout}, step: ${step}, progress: ${progress}`);
-    data.deviceModule.checkRFData();
+    data.deviceModules[0].checkRFData();
     timeout -= intervalSpeed;
     if (timeout <= 0) {
       clearInterval(interval);
@@ -412,22 +428,19 @@ const recordRFFrequence = (data) => new Promise((resolve, reject) => {
     Webserver.emitRecord(data.type, 'Release');
     logger.debug('recordRFFrequence found data');
     clearInterval(interval);
-    data.deviceModule.removeListener('rawRFData', callback);
+    data.deviceModules[0].removeListener('rawRFData', callback);
     data.frq = dataRaw;
 
     setTimeout(() => resolve(data), 1000);
   };
-  data.deviceModule.on('rawRFData', callback);
+  data.deviceModules[0].on('rawRFData', callback);
 });
 
 
 recordAction = (action, data) => {
-  if (config.isRunningRecording) {
-    logger.error('Already recording.');
-    Webserver.emitRecord('running');
-    return;
-  }
   logger.debug(`Record ${action}`);
+
+  Webserver.emitRecord('running');
   switch (action) {
     case 'ir':
       config.setIsRunningRecording(true);
@@ -443,11 +456,11 @@ recordAction = (action, data) => {
           logger.info('done');
         })
         .catch((err) => {
+          config.setIsRunningRecording(false);
           logger.error(`Error ${err}`);
           prepareAction(data)
             .then(deviceExitLearningIR)
             .then(() => {
-              config.setIsRunningRecording(false);
               Webserver.emitRecord('ir', 'exit');
             });
         });
@@ -468,10 +481,10 @@ recordAction = (action, data) => {
         })
         .catch((err) => {
           logger.error(`Error ${err}`);
+          config.setIsRunningRecording(false);
           prepareAction(data)
             .then(deviceExitLearningRF)
             .then(() => {
-              config.setIsRunningRecording(false);
               Webserver.emitRecord('rf', 'exit');
             });
           throw Error(err);
