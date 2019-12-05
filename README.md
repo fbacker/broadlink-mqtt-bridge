@@ -33,4 +33,9 @@ View old readme from here https://github.com/fbacker/broadlink-mqtt-bridge/blob/
 git clone https://github.com/fbacker/broadlink-mqtt-bridge.git
 cd broadlink-mqtt-bridge
 git checkout --detach 32128196a1b185520e25d2284554f018e39d4e2a
+// fix boot script
+sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
+sudo chmod +x /etc/systemd/system/broadlinkbridge.service
+sudo systemctl daemon-reload
+sudo systemctl restart broadlinkbridge.service
 ```
