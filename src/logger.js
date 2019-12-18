@@ -4,6 +4,7 @@
 
 import _ from 'lodash';
 import winston from 'winston';
+import config from './config';
 
 const { format, transports } = winston;
 const alignedWithColorsAndTime = format.combine(
@@ -27,8 +28,13 @@ const alignedWithColorsAndTime = format.combine(
     }`;
   }),
 );
+let logLevel = config.settings.logging.level;
+if (!logLevel) {
+  logLevel = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+}
+console.log(`LOGLEVEL: ${logLevel}`);
 export default winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: logLevel,
   format: alignedWithColorsAndTime,
   transports: [
     new transports.File({

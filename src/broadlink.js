@@ -17,6 +17,7 @@ class Broadlink {
       logger.info(
         `Device found model: ${device.host.model}, id: ${device.host.id}, ip: ${device.host.address}`,
       );
+      logger.debug('Device raw', device);
       this.emit('device', device);
     });
   }
