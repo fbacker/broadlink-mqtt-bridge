@@ -7,13 +7,17 @@ import logger from '../logger';
 
 const fileDelete = (filePath) => new Promise((resolve, reject) => {
   logger.info(`delete file  ${filePath}`);
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      logger.error('Failed to delete file', { err });
-      return reject(new Error('Stopped at deleteFile'));
-    }
-    return resolve({});
-  });
+  if (filePath.substr(0, 9) === 'commands/') {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        logger.error('Failed to delete file', { err });
+        return reject(new Error('Stopped at deleteFile'));
+      }
+      return resolve({});
+    });
+  } else {
+    return reject(new Error('Trying to delete a faulty path'));
+  }
 });
 
 
