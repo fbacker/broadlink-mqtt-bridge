@@ -77,6 +77,12 @@ class WebserverClass {
             logger.debug('Sent message to mqtt');
             res.json({ message: 'Message sent to MQTT' });
           });
+        }).catch((e) => {
+          res.statusCode = 400;
+          return res.json({
+            message: e.message,
+            errors: [e.message],
+          });
         });
       } else {
         res.statusCode = 400;
@@ -170,7 +176,7 @@ class WebserverClass {
           logger.error(`failed to delete file ${req.body.file}`, err);
           res.statusCode = 400;
           return res.json({
-            errors: ['Error occured'],
+            errors: [err.message],
             err,
           });
         });
@@ -184,8 +190,12 @@ class WebserverClass {
     // Clean device list and rescan
     router.get('/rescan', (req, res) => {
       logger.info('Clear current devicelist and rescan');
-      const isRunning = broadlink.discoverDevices();
-      res.json({ running: isRunning });
+      if (config.isRunningScan) {
+        res.json({ running: true });
+      } else {
+        const isRunning = broadlink.discoverDevices();
+        res.json({ running: !isRunning });
+      }
     });
 
     // Block play calls

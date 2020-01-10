@@ -28,7 +28,7 @@ class MQTT {
       });
     });
     this.client.on('reconnect', () => {
-      logger.info('MQTT Reconnected');
+      logger.info('MQTT Trying to reconnect');
     });
     this.client.on('close', () => {
       logger.error('MQTT Closed');

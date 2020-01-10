@@ -14,7 +14,9 @@ class Config {
   }
 
   isPlayBlocked() {
-    return this.isRunningRecording || this.isRunningScan || this.isRunningBlocked;
+    return (
+      this.isRunningRecording || this.isRunningScan || this.isRunningBlocked
+    );
   }
 
   setIsRunningRecording(isRunning) {

@@ -12,6 +12,7 @@
       body,
       html {
         height: 100%;
+        font-family: 'Roboto', sans-serif !important;
       }
       .icon-duplicate {
         position: relative;
@@ -36,10 +37,18 @@
       integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN"
       crossorigin="anonymous"
     />
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+
   </head>
 
   <body>
-    <div id="progressScanning" class="row" style="padding: 10px;">
+
+    <div class="row m-1">
+        <div class="col-auto font-weight-bold">Broadlink MQTT Bridge</div>
+        <div class="col">v.0.8.0</div>   
+    </div>
+
+    <div id="progressScanning" class="row m-1" >
       <div class="progressLabel col-3">Scanning for devices</div>
       <div class="progressLabel col-9">
         <div
@@ -369,7 +378,7 @@
             url: "/api/rescan",
             success: data => {
               console.log("Scan data", data);
-              if (!data.running.isRunning) {
+              if (data.running) {
                 alert("Scan is blocked. Try in a few seconds.");
               }
             }

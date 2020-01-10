@@ -3,7 +3,6 @@ import logger from './src/logger';
 import Webserver from './src/web';
 import config from './src/config';
 
-
 const run = () => {
   logger.info('Starting Broadlink MQTT NodeJS Application');
   Webserver.startServer();
