@@ -41,18 +41,23 @@ const loggingWinston = new LoggingWinston({
   },
 });
 
+const trans = [
+  new transports.File({
+    filename: 'output.log',
+    tailable: true,
+    maxsize: 2000000,
+    maxFiles: 1,
+  }),
+  new transports.Console(),
+];
+
+if (config.settings.logging.remote) {
+  trans.push(loggingWinston);
+}
+
 
 export default winston.createLogger({
   level: logLevel,
   format: alignedWithColorsAndTime,
-  transports: [
-    new transports.File({
-      filename: 'output.log',
-      tailable: true,
-      maxsize: 2000000,
-      maxFiles: 1,
-    }),
-    new transports.Console(),
-    loggingWinston,
-  ],
+  transports: trans,
 });

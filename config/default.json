@@ -1,6 +1,7 @@
 {
   "logging":{
-    "level": "info"
+    "level": "info",
+    "remote": true
   },
   "mqtt": {
     "host": "127.0.0.1",
