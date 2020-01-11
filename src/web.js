@@ -152,7 +152,7 @@ class WebserverClass {
 
     // Get all command files
     router.get('/files', (req, res) => {
-      fileListStructure('./commands')
+      fileListStructure(config.commandsPath)
         .then((data) => {
           res.json(data);
         })
