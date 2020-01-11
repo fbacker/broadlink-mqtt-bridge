@@ -286,7 +286,7 @@ class WebserverClass {
 
   // Play actions
   loopPlay() {
-    playCommand().catch((err) => logger.error(err));
+    playCommand().catch((err) => logger.warn(err));
   }
 
   emitRecord(type, label, progress) {
