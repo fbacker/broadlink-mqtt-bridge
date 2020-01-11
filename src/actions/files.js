@@ -4,10 +4,12 @@ import shell from 'shelljs';
 import md5 from 'md5';
 import md5File from 'md5-file';
 import logger from '../logger';
+import config from '../config';
 
 const fileDelete = (filePath) => new Promise((resolve, reject) => {
   logger.info(`delete file  ${filePath}`);
-  if (filePath.substr(0, 9) === 'commands/') {
+
+  if (filePath.substr(0, config.commandsPath.length) === config.commandsPath) {
     fs.unlink(filePath, (err) => {
       if (err) {
         logger.error('Failed to delete file', { err });
@@ -114,4 +116,27 @@ const fileListStructure = (dir) => {
   return walk(dir);
 };
 
-export { fileDelete, fileListStructure, fileSave };
+const checkCommandFilesFlatten = (arr, obj) => {
+  if (!obj.children) {
+    arr.push(obj);
+    return arr;
+  }
+  obj.children.forEach((element) => checkCommandFilesFlatten(arr, element));
+  return arr;
+};
+
+const checkCommandFiles = (folderPath) => {
+  logger.debug(`Check command files ${folderPath}`);
+  fileListStructure(folderPath).then((result) => {
+    if (result.children.length === 0) {
+      logger.error('Missing commands', result);
+      return;
+    }
+    const flattened = checkCommandFilesFlatten([], result);
+    logger.info(`Found ${flattened.length} commands in folder`);
+  });
+};
+
+export {
+  checkCommandFiles, fileDelete, fileListStructure, fileSave,
+};
