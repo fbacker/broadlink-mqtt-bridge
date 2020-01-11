@@ -5,6 +5,8 @@ import http from 'http';
 import socket from 'socket.io';
 import bodyParser from 'body-parser';
 import request from 'request';
+import sysinfo from 'systeminformation';
+
 import broadlink from './broadlink';
 import mqtt from './mqtt';
 import config from './config';
@@ -206,6 +208,25 @@ class WebserverClass {
       this.io.emit('blocked', config.isRunningBlocked);
       if (!block) config.clearUnblockedQueue();
       res.json({ happy: true });
+    });
+
+
+    // Get system information
+    router.get('/info', (req, res) => {
+      sysinfo.osInfo((os) => {
+        delete os.serial;
+        delete os.servicepack;
+        delete os.hostname;
+        sysinfo.versions((v) => {
+          const versions = {
+            git: v.git, node: v.node, npm: v.npm, v8: v.v8,
+          };
+          sysinfo.processLoad(process.pid, (p) => {
+            const process = { cpu: p.cpu, memory: p.mem };
+            res.json({ os, versions, process });
+          });
+        });
+      });
     });
 
 
