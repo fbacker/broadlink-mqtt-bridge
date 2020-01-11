@@ -223,7 +223,9 @@ class WebserverClass {
           };
           sysinfo.processLoad(process.pid, (p) => {
             const process = { cpu: p.cpu, memory: p.mem };
-            res.json({ os, versions, process });
+            const o = { os, versions, process };
+            logger.info('System Information', o);
+            res.json(o);
           });
         });
       });
