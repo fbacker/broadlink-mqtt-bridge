@@ -1,0 +1,28 @@
+{
+  "logging":{
+    "level": "info"
+  },
+  "mqtt": {
+    "host": "0.0.0.0",
+    "port": 1883,
+    "protocol": "mqtt",
+    "subscribeBasePath": "broadlink/"
+  },
+  "queue": {
+    "delay": 500
+  },
+  "webhooks": {
+    "scanCompleted": null
+  },
+  "recording": {
+    "timeout": {
+      "ir": 15,
+      "rf": 15
+    },
+    "path": "/commands"
+  },
+  "gui": {
+    "port": 3000,
+    "logs": 3001
+  }
+}

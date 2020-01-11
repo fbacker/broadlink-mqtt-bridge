@@ -1,5 +1,10 @@
+.vscode
 commands
 config/local.json
 node_modules
 *.log
 tmp-*
+github
+installers
+test
+*.md
