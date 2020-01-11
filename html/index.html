@@ -313,6 +313,7 @@
         // Loaded config from server
         socket.on("config", msg => {
           config = msg;
+          console.log("Config", config)
           setup();
         });
 
