@@ -1,9 +1,10 @@
 // -------------------------------------
 //      SETUP LOGGER with Winston
 // -------------------------------------
-
+import path from 'path';
 import _ from 'lodash';
 import winston from 'winston';
+import { LoggingWinston } from '@google-cloud/logging-winston';
 import config from './config';
 
 const { format, transports } = winston;
@@ -28,11 +29,19 @@ const alignedWithColorsAndTime = format.combine(
     }`;
   }),
 );
-let logLevel = config.settings.logging.level;
-if (!logLevel) {
-  logLevel = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
-}
+const logLevel = config.settings.logging.level;
 console.log(`LOGLEVEL: ${logLevel}`);
+
+const loggingWinston = new LoggingWinston({
+  level: 'error',
+  keyFilename: path.join(__dirname, '../', 'gapi.json'),
+  serviceContext: {
+    service: 'broadlinkmqttbridge',
+    version: '0.8.0',
+  },
+});
+
+
 export default winston.createLogger({
   level: logLevel,
   format: alignedWithColorsAndTime,
@@ -44,5 +53,6 @@ export default winston.createLogger({
       maxFiles: 1,
     }),
     new transports.Console(),
+    loggingWinston,
   ],
 });

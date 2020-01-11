@@ -10,6 +10,7 @@
     "production": "node -r esm index.js"
   },
   "dependencies": {
+    "@google-cloud/logging-winston": "^3.0.4",
     "body-parser": "^1.19.0",
     "broadlinkjs-rm": "git+https://github.com/fbacker/broadlinkjs-rm",
     "config": "^3.2.4",

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "pristine-surf-264721",
+  "private_key_id": "eee1ef2c6d2f84692bf5ccde20d36d18b9b89bd4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCxeV1HzrJ4ihze\nCuQVvCng4fBc82BbzHLCHl63k70IKDCRPXRshAYkwm3s5feI/djH3MEmXk7j975i\n4BxdVcuNMSn6v64KHYe2pBy0L0V3v5U2em17CmiZckl/1+fvL19ChWztopxj2WHP\nnf2Hh/OxBmM+dWkV8F7A34A2pQnx1V4yOm9R2bqXshsUDMq7oFD14evZbXwk4k87\nG6AeftUGNRYVRxtrdEvH3tt5vwv+bSPl43h6AsA6iNAwb795OzyxBJNfaBpfZ1ct\nPKd0jspKk67O+XS+oIldOvBzeety73tCrEavyuofgyp7GtBgkC4M+o12l4cxp01I\nrd4Qrp/PAgMBAAECggEABDRETe2rE6jt6yKl6Y/mDBI+H+2SBEqxE0El7EJfMYDG\nOcKTbfiorpk+gmSmOwQMbRuhJbgJNWRKicwWT+223zbhcDO3Oz0c2GpF1czi3+XV\nco9u5YHHHY90B0fFkkh0gL5paK2397OQGht7hIjncHOeyT19ykvB6t7AikrZk/V4\nR1iBJUsBMj3Zg1WEKhVMb7ewP6PKrWf1EqfClbdR5OEgmxbyfJw6XFADEnGfqY4J\nZ60hDUebErWccHwgrz6KDkrm8hfSPRlEYtiCbMLyocX2Zy3VE+E457TaCeXbQzbN\nz7T7Drk+5U9/7vJq611+jv8kptropMXtCF2h4qw6dQKBgQD5NjLCg10AQoaTytw+\nJdx5AKi48+63wfsWtApxHS6uXm5NY0qTwGtd+ikAdckfG7K6QZqaTjv2KkgmRnj3\n2EFGnkEUx1lHte+1907M5tXXLt0thbOi5qABUdzQwaW7j+aC6tDCcjwhVSaQp6k/\ntYolSUNczKk8VHJlEvM0jDgyVQKBgQC2Tuz2oXItJEVgArEq81lmgdvKi8kVJwYk\nZE0/lL7HEM+w1QSY4+Nrh5GD4CVlzpP/qU7ubaBPfomF3lPq8AG+iALbg2bnnex1\n6DK8QCkDepg3uDVey1aPT8HDOsqt2vG3NS5qUXXIc4/CupGox1E9M+TCWV6WG9r9\nGn6EM2XVkwKBgFy88n6366/hEbuFzhfCdx0ARckt3TO8l/eG4CvftDNnKJzbyjDZ\ndhrusLtfGYzd/dCaATJS0rV0Xoz/xJxWeVQSKB3XYT3yUlXgxg4yCHmfEueRzZtd\nP0W+dPGqXkZB8oHdZ/o0EHRG/6bs/Wqb3+CoNs0dzAyLUFaUirSPSYpRAoGAb+yW\nqHfHrBUnjmE4ueC60ycIdBpLsnPJ3o/BqTY9xeL5T1wIPYEzPvH1EVyMOSuRSxV7\nwv+Euyk5bvlm1cbRm1LPRksu4yXeZSjP9SkCxQL/7r1l7rOxibxyfdRbWE8htNOu\nklE+mXjxGqEGCfOMWaHBYNwTKN8jG96nK6yOaYcCgYAgfe+7jFQrv8pn5J3IVwNj\nBUCtE8/EEL9J0vRkdpOx/euB/VAVVpFXx3OXzg3TjQ9wQeVBSnRbpRPmajkB/xVU\nAsAF3ZDuo9IJafWXItBvz2Mq2MoQXCpy6kcUQiH0FYa4zzcC1wY70uaL8XG28x7e\n9oF9azcdp1AnHjAVXwJV7A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "broadlinklogwriter@pristine-surf-264721.iam.gserviceaccount.com",
+  "client_id": "109803927439118993670",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/broadlinklogwriter%40pristine-surf-264721.iam.gserviceaccount.com"
+}
