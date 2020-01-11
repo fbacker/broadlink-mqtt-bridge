@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# THANKS FOR AWESOME BASE CREATED BY:
-#   MAGIC MIRROR
-
+# Install with
 # bash -c "$(curl -sL https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bridge/master/installers/raspberry.sh)"
 
 
@@ -16,6 +14,11 @@ echo "|: |_)  :|:  __   \\        /   /  \\  \|:       :( \_|:  \ /\  ||    \   
 echo "(_______/|__|  \___)\"_____(___/    \___(________/ \_______(__\_|_\___|\____\(__|  \__) "
 echo -e "\e[0m"
 
+# Location
+PATH_TARGET=/srv/openhab2-conf
+PATH_FOLDER=broadlink-mqtt-bridge
+PATH_FULL="$PATH_TARGET/$PATH_FOLDER"
+
 # Define the tested version of Node.js.
 NODE_TESTED="v8.12.0"
 
@@ -23,12 +26,12 @@ NODE_TESTED="v8.12.0"
 ARM=$(uname -m) 
 
 # Check the Raspberry Pi version.
-if [ "$ARM" != "armv7l" ]; then
-	echo -e "\e[91mSorry, your Raspberry Pi is not supported."
-	echo -e "\e[91mPlease run OpenHAB RPI on a Raspberry Pi 2 or 3."
-	echo -e "\e[91mIf this is a Pi Zero, you are in the same boat as the original Raspberry Pi. You must run in server only mode."
-	exit;
-fi
+#if [ "$ARM" != "armv7l" ]; then
+#	echo -e "\e[91mSorry, your Raspberry Pi is not supported."
+#	echo -e "\e[91mPlease run OpenHAB RPI on a Raspberry Pi 2 or 3."
+#	echo -e "\e[91mIf this is a Pi Zero, you are in the same boat as the original Raspberry Pi. You must run in server only mode."
+#	exit;
+#fi
 
 # Define helper methods.
 function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
@@ -36,7 +39,7 @@ function command_exists () { type "$1" &> /dev/null ;}
 
 # Installing helper tools
 echo -e "\e[96mInstalling helper tools ...\e[90m"
-sudo apt-get --assume-yes install git || exit
+#sudo apt-get --assume-yes install git || exit
 
 # Check if we need to install or upgrade Node.js.
 echo -e "\e[96mCheck current Node installation ...\e[0m"
@@ -69,57 +72,41 @@ fi
 
 
 # Install Broadlink-bridge
-cd /srv/openhab2-conf
-if [ -d "./broadlink-mqtt-bridge" ] ; then
-	echo -e "\e[93mIt seems like Broadlink-Bridge is already installed."
-	echo -e "We'll try to upgrade instead."
-	echo ""
-    cd /srv/openhab2-conf/broadlink-mqtt-bridge
-
-    echo -e "\e[96mUpgrade ...\e[90m"
-	git reset --hard
-    if git pull; then 
-        echo -e "\e[92mUpgrade Done!\e[0m"
-		sudo rm -r ./node_modules
-		npm install --production
-		sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
-		sudo chmod +x /etc/systemd/system/broadlinkbridge.service
-		sudo systemctl daemon-reload
-		sudo systemctl restart broadlinkbridge.service
-		echo -e "\e[92mService rebooted and ready!\e[0m"
-    else
-        echo -e "\e[91mUnable to upgrade."
-        echo -e "\e[91mPlease run git pull manually."
-        exit;
-    fi
-	exit;
+cd "$PATH_TARGET"
+if [ ! -d "./$PATH_FOLDER" ] ; then
+	echo -e "\e[96mCloning ...\e[90m"
+	if git clone --depth=1 https://github.com/fbacker/broadlink-mqtt-bridge.git; then 
+		echo -e "\e[92mCloning Done!\e[0m"
+	else
+		echo -e "\e[91mUnable to clone."
+		exit;
+	fi
 fi
 
-echo -e "\e[96mCloning ...\e[90m"
-if git clone --depth=1 https://github.com/fbacker/broadlink-mqtt-bridge.git; then 
-	echo -e "\e[92mCloning Done!\e[0m"
-else
-	echo -e "\e[91mUnable to clone."
-	exit;
-fi
+cd "$PATH_FULL"
+echo -e "\e[96mUpgrade ...\e[90m"
+git reset --hard
+sudo rm -r ./node_modules
+if git pull; then 
+	echo -e "\e[92mUpgrade Done!\e[0m"
+	echo -e "\e[92mInstall packages\e[0m"
+	
+	if npm install --production; then 
+		echo -e "\e[92mDependencies installation Done!\e[0m"
+	else
+		echo -e "\e[91mUnable to install dependencies!"
+		exit;
+	fi
 
-cd /srv/openhab2-conf/broadlink-mqtt-bridge  || exit
-echo -e "\e[96mInstalling dependencies ...\e[90m"
-if npm install --production; then 
-	echo -e "\e[92mDependencies installation Done!\e[0m"
-else
-	echo -e "\e[91mUnable to install dependencies!"
-	exit;
-fi
-
-# Use pm2 control like a service MagicMirror
-read -p "Do you want use auto starting on RPI Reboot (y/N)?" choice
-if [[ $choice =~ ^[Yy]$ ]]; then
-	sudo cp /srv/openhab2-conf/broadlink-mqtt-bridge/installers/boot/broadlinkbridge.service /etc/systemd/system/
+	echo -e "\e[92mUpdate System Services\e[0m"
+	sudo cp "$PATH_FULL/installers/boot/broadlinkbridge.service" /etc/systemd/system/
 	sudo chmod +x /etc/systemd/system/broadlinkbridge.service
-	sudo systemctl enable broadlinkbridge.service
-	sudo systemctl start broadlinkbridge.service
-    echo -e "\e[92mAll is configured.\e[0m"
-else 
-    echo -e "\e[92mInstallation is complete.\e[0m"
+	sudo systemctl daemon-reload
+	sudo systemctl restart broadlinkbridge.service
+	echo -e "\e[92mBroadlink rebooted and ready!\e[0m"
+else
+	echo -e "\e[91mUnable to upgrade."
+	echo -e "\e[91mPlease run git pull manually."
+	exit;
 fi
+exit;
