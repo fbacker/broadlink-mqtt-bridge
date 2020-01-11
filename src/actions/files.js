@@ -16,7 +16,7 @@ const fileDelete = (filePath) => new Promise((resolve, reject) => {
       return resolve({});
     });
   } else {
-    return reject(new Error('Trying to delete a faulty path'));
+    return reject(new Error(`Trying to delete a faulty path '${filePath}'`));
   }
 });
 
