@@ -37,7 +37,7 @@ const loggingWinston = new LoggingWinston({
   keyFilename: path.join(__dirname, '../', 'gapi.json'),
   serviceContext: {
     service: 'broadlinkmqttbridge',
-    version: '0.8.0',
+    version: config.settings.version,
   },
 });
 

@@ -44,7 +44,7 @@
   <body>
 
     <div class="row m-1">
-        <div class="col font-weight-bold">Broadlink MQTT Bridge <small>v.0.8.0</small></div>
+        <div class="col font-weight-bold">Broadlink MQTT Bridge <small id="labelVersion">v.x</small></div>
         <div class="col text-right">
             <button
               type="button"
@@ -313,6 +313,7 @@
         // Loaded config from server
         socket.on("config", msg => {
           config = msg;
+          $("#labelVersion").text("v"+config.version);
           console.log("Config", config)
           setup();
         });
