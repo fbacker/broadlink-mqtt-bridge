@@ -17,7 +17,7 @@ class Broadlink {
       logger.info(
         `Device found model: ${device.host.model}, id: ${device.host.id}, ip: ${device.host.address}`,
       );
-      logger.debug('Device raw', device);
+      logger.debug('Device raw', device.host);
       this.emit('device', device);
     });
   }
@@ -53,6 +53,7 @@ class Broadlink {
     device.host.macAddress = macAddressParts.join(':');
     device.host.id = macAddressParts.join('');
     device.host.model = device.model;
+    device.host.type = device.type;
     this.broadlink.devices[device.host.id] = device;
   }
 
