@@ -637,8 +637,11 @@
             let p = data.node.original.path;
             p = p.substr(p.indexOf("/") + 1);
             p = p.substring(p, p.lastIndexOf("."));
+            const commands = config.recording.path ? config.recording.path : "commands";
             const p1 = p.substring(p.lastIndexOf("/") + 1);
-            const p2 = p.substring(p, p.lastIndexOf("/"));
+            const p2 = p.substring(p.indexOf(commands)+commands.length+1, p.lastIndexOf("/"));
+
+            console.log("click", {data, p, p1, p2, subscribeBasePath:config.mqtt.subscribeBasePath});
             $("#inputTopic").val(config.mqtt.subscribeBasePath + p2);
             $("#inputMessage").val(p1);
             $("#btnDelete").attr("disabled", false);
