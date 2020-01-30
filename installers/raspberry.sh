@@ -12,6 +12,9 @@ echo "|:     \/|_____/   /  /    ) :/' /\  \  |: \   ) ||:  |     |:  ||: \.   \
 echo "(|  _  \\ //      (: (____/ ///  __'  \ (| (___\ ||\  |___  |.  ||.  \    \. (// _  \   "
 echo "|: |_)  :|:  __   \\        /   /  \\  \|:       :( \_|:  \ /\  ||    \    \ |: | \  \  "
 echo "(_______/|__|  \___)\"_____(___/    \___(________/ \_______(__\_|_\___|\____\(__|  \__) "
+echo ""
+echo "Version 1.1.0"
+echo ""
 echo -e "\e[0m"
 
 # Location
@@ -87,6 +90,7 @@ cd "$PATH_FULL"
 echo -e "\e[96mUpgrade ...\e[90m"
 git reset --hard
 sudo rm -r ./node_modules
+sudo rm package-lock.json
 if git pull; then 
 	echo -e "\e[92mUpgrade Done!\e[0m"
 	echo -e "\e[92mInstall packages\e[0m"
@@ -97,16 +101,16 @@ if git pull; then
 		echo -e "\e[91mUnable to install dependencies!"
 		exit;
 	fi
-
-	echo -e "\e[92mUpdate System Services\e[0m"
-	sudo cp "$PATH_FULL/installers/boot/broadlinkbridge.service" /etc/systemd/system/
-	sudo chmod +x /etc/systemd/system/broadlinkbridge.service
-	sudo systemctl daemon-reload
-	sudo systemctl restart broadlinkbridge.service
-	echo -e "\e[92mBroadlink rebooted and ready!\e[0m"
 else
 	echo -e "\e[91mUnable to upgrade."
 	echo -e "\e[91mPlease run git pull manually."
 	exit;
 fi
+
+echo -e "\e[92mUpdate System Services\e[0m"
+sudo cp "$PATH_FULL/installers/boot/broadlinkbridge.service" /etc/systemd/system/
+sudo chmod +x /etc/systemd/system/broadlinkbridge.service
+sudo systemctl daemon-reload
+sudo systemctl restart broadlinkbridge.service
+echo -e "\e[92mBroadlink rebooted and ready!\e[0m"
 exit;
