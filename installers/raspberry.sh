@@ -23,7 +23,8 @@ PATH_FOLDER=broadlink-mqtt-bridge
 PATH_FULL="$PATH_TARGET/$PATH_FOLDER"
 
 # Define the tested version of Node.js.
-NODE_TESTED="v8.12.0"
+NODE_TESTED="v10.13.0"
+NPM_TESTED="6.4.1"
 
 # Determine which Pi is running.
 ARM=$(uname -m) 
@@ -46,31 +47,39 @@ echo -e "\e[96mInstalling helper tools ...\e[90m"
 
 # Check if we need to install or upgrade Node.js.
 echo -e "\e[96mCheck current Node installation ...\e[0m"
-NODE_INSTALL=false
 if command_exists node; then
 	echo -e "\e[0mNode currently installed. Checking version number.";
 	NODE_CURRENT=$(node -v)
 	echo -e "\e[0mMinimum Node version: \e[1m$NODE_TESTED\e[0m"
 	echo -e "\e[0mInstalled Node version: \e[1m$NODE_CURRENT\e[0m"
 	if version_gt $NODE_TESTED $NODE_CURRENT; then
-		echo -e "\e[96mNode should be upgraded.\e[0m"
-		NODE_INSTALL=true
-
-		# Check if a node process is currenlty running.
-		# If so abort installation.
-		if pgrep "node" > /dev/null; then
-			echo -e "\e[91mA Node process is currently running. Can't upgrade."
-			echo "Please quit all Node processes and restart the installer."
-			exit;
-		fi
-
+		echo -e "\e[96mNode needs to be upgraded.\e[0m"
+		exit;
 	else
 		echo -e "\e[92mNo Node.js upgrade necessary.\e[0m"
 	fi
 
 else
 	echo -e "\e[93mNode.js is not installed.\e[0m";
-	NODE_INSTALL=true
+	exit;
+fi
+
+echo -e "\e[96mCheck current NPM installation ...\e[0m"
+if command_exists npm; then
+	echo -e "\e[0mNPM currently installed. Checking version number.";
+	NPM_CURRENT=$(npm -v)
+	echo -e "\e[0mMinimum NPM version: \e[1m$NPM_TESTED\e[0m"
+	echo -e "\e[0mInstalled NPM version: \e[1m$NPM_CURRENT\e[0m"
+	if version_gt $NPM_TESTED $NPM_CURRENT; then
+		echo -e "\e[96mNPM needs to be upgraded.\e[0m"
+		exit;
+	else
+		echo -e "\e[92mNo NPM upgrade necessary.\e[0m"
+	fi
+
+else
+	echo -e "\e[93mNPM is not installed.\e[0m";
+	exit;
 fi
 
 
