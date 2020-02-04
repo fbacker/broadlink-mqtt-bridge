@@ -5,7 +5,7 @@ import path from 'path';
 class Config {
   constructor(settings) {
     this.settings = settings;
-    this.settings.version = '2.0.2';
+    this.settings.version = '2.1.2';
     this.commandsPath = settings.recording.path || path.join(__dirname, '../', 'commands');
     this.isRunningRecording = false;
     this.isRunningScan = false;

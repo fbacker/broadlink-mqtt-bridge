@@ -20,6 +20,25 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
 
   data.topic = data.topic.toLowerCase();
   data.message = data.message.toLowerCase(); // logging output doesn't work with the name message
+
+
+  const r = /(?:\.*\D)/gi;
+  const e = r.exec(data.message);
+  logger.debug(`Prepare check regex pattern if number ${e}`);
+  if (!e) {
+    const msgint = parseInt(message);
+    if (!isNaN(msgint)) {
+      // INT VALUE
+      data.message = msgint.toString();
+    }
+  }
+
+
+  const msgint = parseInt(data.message, 16);
+  if (!isNaN(msgint)) {
+    // INT VALUE
+    data.message = msgint.toString();
+  }
   let device = null;
 
   // broadcasting wants to use specific device
