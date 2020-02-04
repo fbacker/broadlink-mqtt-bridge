@@ -26,7 +26,7 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
   const e = r.exec(data.message);
   logger.debug(`Prepare check regex pattern if number ${e}`);
   if (!e) {
-    const msgint = parseInt(message);
+    const msgint = parseInt(data.message);
     if (!isNaN(msgint)) {
       // INT VALUE
       data.message = msgint.toString();

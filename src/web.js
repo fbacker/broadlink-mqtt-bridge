@@ -75,7 +75,8 @@ class WebserverClass {
           // if running is blocked, make gui calls still possible
           if (config.isRunningBlocked) config.addItemToUnblockedQueue(data);
           // send to mqtt
-          mqtt.publish(data.topic, data.message, () => {
+          const t = device ? `${topic}:${device}` : topic;
+          mqtt.publish(t, data.message, () => {
             logger.debug('Sent message to mqtt');
             res.json({ message: 'Message sent to MQTT' });
           });
