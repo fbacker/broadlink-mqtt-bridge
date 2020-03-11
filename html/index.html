@@ -356,14 +356,21 @@
         socket.on("device", msg => {
           $("#listDevicesNoDevice").remove(); // remove tmp text
           var e = $(`#${msg.id}`);
+          var label = "";
+          if(config.devices[msg.id]){
+            var deviceName = config.devices[msg.id];
+            label = `<br />${deviceName}`;
+          }
+          
           if (e.length === 0) {
+            $("#inputDevice").val(msg.id);
             e = `<div id="${msg.id}" style="margin-top:5px;">
                               <div class="row">
                                 <div class="col">${msg.model}</div>
                                 <div class="col-5 text-right">${msg.address}</div>
                               </div>
                               <div class="row">
-                                <div class="col">ID: ${msg.id}</div>
+                                <div class="col">ID: ${msg.id}${label}</div>
                                 <div class="col-5 text-right"><div class="btn btn-sm btn-primary deviceSelector">SELECT</div></div>
                               </div>
                             </div>`;
