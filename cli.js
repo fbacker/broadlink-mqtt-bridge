@@ -18,6 +18,12 @@ const { argv } = require('yargs')
   .alias('h', 'help');
 
 
+const convertHex = (content) => {
+  const data = Buffer.from(content, 'hex');
+  return data;
+};
+
+
 fs.exists(argv.file, (exists) => {
   if (!exists) {
     console.error(`Error: File ${argv.file} doesn't exists`);
@@ -28,7 +34,7 @@ fs.exists(argv.file, (exists) => {
       console.error(`Error: Read file issue ${err.message}`);
       process.exit();
     }
-    const dataOutput = Buffer.from(dataInput);
+    const dataOutput = convertHex(dataInput);
     const fileOutput = argv.output ? argv.output : `${path.parse(argv.file).name}.bin`;
     fs.writeFile(fileOutput, dataOutput, { flag: 'w' }, (err1) => {
       if (err1) {
