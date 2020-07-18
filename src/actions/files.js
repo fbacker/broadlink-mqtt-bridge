@@ -22,7 +22,6 @@ const fileDelete = (filePath) => new Promise((resolve, reject) => {
   }
 });
 
-
 // Save action
 const fileSave = (data) => new Promise((resolve, reject) => {
   logger.info(`Save data to file topic ${data.topic}, file: ${data.filePath}`);
@@ -127,13 +126,19 @@ const checkCommandFilesFlatten = (arr, obj) => {
 
 const checkCommandFiles = (folderPath) => {
   logger.debug(`Check command files ${folderPath}`);
-  fileListStructure(folderPath).then((result) => {
-    if (result.children.length === 0) {
-      logger.error('Missing commands', result);
-      return;
+  fs.stat(folderPath, (err) => {
+    if (err) {
+      logger.error(`Missing folder for command files at ${folderPath}`);
+      throw new Error('Force shutdown, missing commands folder');
     }
-    const flattened = checkCommandFilesFlatten([], result);
-    logger.info(`Found ${flattened.length} commands in folder`);
+    fileListStructure(folderPath).then((result) => {
+      if (result.children.length === 0) {
+        logger.error('Missing commands', result);
+        return;
+      }
+      const flattened = checkCommandFilesFlatten([], result);
+      logger.info(`Found ${flattened.length} commands in folder`);
+    });
   });
 };
 
