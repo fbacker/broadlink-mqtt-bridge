@@ -51,10 +51,7 @@ const fileListStructure = (dir) => {
             if (!stats.isDirectory()) {
               return resolve(
                 new Promise((resolve, reject) => {
-                  md5File(entry, (err, hash) => {
-                    if (err) {
-                      return reject(err);
-                    }
+                  md5File(entry).then((hash) => {
                     resolve({
                       path: entry,
                       type: 'file',
@@ -66,7 +63,7 @@ const fileListStructure = (dir) => {
                       icon:
                           path.extname(entry) === '.bin' ? 'fas fa-bolt' : null,
                     });
-                  });
+                  }).catch((err1) => reject(err1));
                 }),
               );
               /*
@@ -126,19 +123,23 @@ const checkCommandFilesFlatten = (arr, obj) => {
 
 const checkCommandFiles = (folderPath) => {
   logger.debug(`Check command files ${folderPath}`);
+  /*
   fs.stat(folderPath, (err) => {
     if (err) {
       logger.error(`Missing folder for command files at ${folderPath}`);
       throw new Error('Force shutdown, missing commands folder');
     }
-    fileListStructure(folderPath).then((result) => {
-      if (result.children.length === 0) {
-        logger.error('Missing commands', result);
-        return;
-      }
-      const flattened = checkCommandFilesFlatten([], result);
-      logger.info(`Found ${flattened.length} commands in folder`);
-    });
+  });
+  */
+  fileListStructure(folderPath).then((result) => {
+    if (result.children.length === 0) {
+      logger.error('Missing commands', result);
+      return;
+    }
+    const flattened = checkCommandFilesFlatten([], result);
+    logger.info(`Found ${flattened.length} commands in folder`);
+  }).catch((err) => {
+    logger.error('not happy', err);
   });
 };
 
