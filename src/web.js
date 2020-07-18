@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 import express from 'express';
 import http from 'http';
@@ -211,7 +210,6 @@ class WebserverClass {
       res.json({ happy: true });
     });
 
-
     // Get system information
     router.get('/info', (req, res) => {
       sysinfo.osInfo((os) => {
@@ -222,16 +220,12 @@ class WebserverClass {
           const versions = {
             git: v.git, node: v.node, npm: v.npm, v8: v.v8,
           };
-          sysinfo.processLoad(process.pid, (p) => {
-            const process = { cpu: p.cpu, memory: p.mem };
-            const o = { os, versions, process };
-            logger.info('System Information', o);
-            res.json(o);
-          });
+          const o = { os, versions, config: config.settings };
+          logger.info('System Information', o);
+          res.json(o);
         });
       });
     });
-
 
     return router;
   }
@@ -328,7 +322,6 @@ class WebserverClass {
 }
 const Webserver = new WebserverClass();
 
-
 // learn ir
 const deviceEnterLearningIR = (data) => new Promise((resolve) => {
   Webserver.emitRecord(data.type, 'Wait', 0);
@@ -365,7 +358,6 @@ const deviceExitLearningRF = (data) => new Promise((resolve) => {
   data.deviceModules[0].cancelLearn();
   resolve(data);
 });
-
 
 // Record a IR Signal
 const recordIR = (data) => new Promise((resolve, reject) => {
@@ -469,7 +461,6 @@ const recordRFFrequence = (data) => new Promise((resolve, reject) => {
   };
   data.deviceModules[0].on('rawRFData', callback);
 });
-
 
 recordAction = (action, data) => {
   logger.debug(`Record ${action}`);
