@@ -132,6 +132,10 @@ const checkCommandFiles = (folderPath) => {
   });
   */
   fileListStructure(folderPath).then((result) => {
+    if (!result.children) {
+      logger.error('Missing commands folder. Please create a folder called "commands" and restart service.');
+      return;
+    }
     if (result.children.length === 0) {
       logger.error('Missing commands', result);
       return;
