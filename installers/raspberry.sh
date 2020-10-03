@@ -95,6 +95,7 @@ if [ ! -d "./$PATH_FOLDER" ] ; then
 	fi
 fi
 
+# remove user thingies that break update, reinstall dependencies
 cd "$PATH_FULL"
 echo -e "\e[96mUpgrade ...\e[90m"
 git reset --hard
@@ -114,6 +115,13 @@ else
 	echo -e "\e[91mUnable to upgrade."
 	echo -e "\e[91mPlease run git pull manually."
 	exit;
+fi
+
+# make sure commands folder exists
+cd "$PATH_FULL"
+if [ ! -d "./commands" ] ; then
+	echo -e "\e[92mMissing commands folder, creating it!\e[0m"
+	mkdir "./commands"
 fi
 
 echo -e "\e[92mUpdate System Services\e[0m"
