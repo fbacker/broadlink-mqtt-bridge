@@ -24,7 +24,7 @@
     "request": "^2.88.2",
     "shelljs": "^0.8.4",
     "socket.io": "^2.3.0",
-    "systeminformation": "^4.27.6",
+    "systeminformation": "^4.27.11",
     "winston": "^3.3.3",
     "yargs": "^16.0.3"
   },
