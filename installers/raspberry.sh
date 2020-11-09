@@ -13,12 +13,12 @@ echo "(|  _  \\ //      (: (____/ ///  __'  \ (| (___\ ||\  |___  |.  ||.  \    
 echo "|: |_)  :|:  __   \\        /   /  \\  \|:       :( \_|:  \ /\  ||    \    \ |: | \  \  "
 echo "(_______/|__|  \___)\"_____(___/    \___(________/ \_______(__\_|_\___|\____\(__|  \__) "
 echo ""
-echo "Version 2.4.0"
+echo "Version 3.0.0"
 echo ""
 echo -e "\e[0m"
 
 # Location
-PATH_TARGET=/srv/openhab2-conf
+PATH_TARGET=pwd
 PATH_FOLDER=broadlink-mqtt-bridge
 PATH_FULL="$PATH_TARGET/$PATH_FOLDER"
 
@@ -127,6 +127,7 @@ fi
 echo -e "\e[92mUpdate System Services\e[0m"
 sudo cp "$PATH_FULL/installers/boot/broadlinkbridge.service" /etc/systemd/system/
 sudo chmod +x /etc/systemd/system/broadlinkbridge.service
+sed -i "s/FOLDER_PATH_REPLACE/$PATH_FULL/" /etc/systemd/system/broadlinkbridge.service
 sudo systemctl daemon-reload
 sudo systemctl restart broadlinkbridge.service
 echo -e "\e[92mBroadlink rebooted and ready!\e[0m"

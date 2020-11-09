@@ -22,13 +22,9 @@ It has a Admin GUI for helping record IR / RF signals. You will be able with the
 - MQTT (mosquitto in OpenHAB)
 - Broadlink device e.g. RM 3 PRO
 
-## Breaking Changes v1 -> v2 OpenHAB
-
-If previously been using this service and upgrading you'll need to migrate OpenHAB way of handling things.
-
-Binding MQTT 1.x (legacy) doesn't work. Please use the updated way of handling MQTT messages with OpenHAB. View wiki for examples. There's also example of how to downgrade to latest release of version 1.
-
 ## Breaking Changes v2 -> v3 (buffer to base64)
+
+**WARNING:** upgrade is changed. Please read the installation page
 
 Commands are saved as base64 files to make it easier to copy from/to other systems.
 
@@ -38,3 +34,10 @@ To migrate existing commands run ```npm run convert``` in the service folder. Th
 
 You can se on the icons what is 'old file -> disclaimer (marked file)' and 'new base64 file .> bolt'.
 ![admin gui](https://raw.githubusercontent.com/fbacker/broadlink-mqtt-bridge/master/github/icons-change.png)
+
+
+## Breaking Changes v1 -> v2 OpenHAB
+
+If previously been using this service and upgrading you'll need to migrate OpenHAB way of handling things.
+
+Binding MQTT 1.x (legacy) doesn't work. Please use the updated way of handling MQTT messages with OpenHAB. View wiki for examples. There's also example of how to downgrade to latest release of version 1.

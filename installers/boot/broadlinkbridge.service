@@ -3,7 +3,7 @@ Description=Broadlink MQTT Bridge
 After=mosquitto.service
 
 [Service]
-WorkingDirectory=/srv/openhab2-conf/broadlink-mqtt-bridge/
+WorkingDirectory=FOLDER_PATH_REPLACE
 ExecStart=/usr/bin/npm run production
 Restart=always
 RestartSec=10
