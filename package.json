@@ -7,7 +7,8 @@
     "start": "node -r esm index.js",
     "development": "nodemon -r esm --inspect index.js localhost 3000",
     "logs": "frontail --port 3001 --disable-usage-stats output.log",
-    "production": "node -r esm index.js"
+    "production": "node -r esm index.js",
+    "convert": "node -r esm convert-to-base64.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

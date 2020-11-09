@@ -123,7 +123,7 @@ class WebserverClass {
         })
           .then(() => {
             logger.info('Record Completed');
-            res.json({ message: `Recording completed for ${req.body.topic}` });
+            res.json({ message: `Recording completed for ${req.body.topic}`, success: true });
           })
           .catch((err) => {
             res.statusCode = 500;
@@ -131,6 +131,7 @@ class WebserverClass {
               message: `Recording failed for for ${req.body.topic}, please se log.`,
               errors: [`Failed ${err}`],
               err,
+              success: false,
             });
           });
       } else {

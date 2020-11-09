@@ -511,6 +511,7 @@
           }
 
           $("html, body").animate({ scrollTop: 0 }, "slow");
+          //console.log("send request",  {topic, message, device, type });
           $.ajax({
             type: "POST",
             url: `/api/${action}`,
@@ -533,8 +534,7 @@
           });
         });
 
-        let hashList = [];
-        let hashDuplicates = [];
+        let hashList = {};
 
         // jstree plugin to render a duplicate
         $.jstree.plugins.duplicate = function(options, parent) {
@@ -545,41 +545,56 @@
               var node = this._model.data[node_id];
               var data = node && node.original ? node.original : null;
               if (data && data.type === "file") {
+
                 // @TODO, only copied files are marked as duplicates. Not same recorded signal
-                // if (hashDuplicates.includes(data.hash)) {
-                //   $(el)
-                //     .find("a > i")
-                //     .prepend(
-                //       '<i class="fas fa-exclamation-triangle text-danger icon-duplicate"></i>'
-                //     );
-                // }
+                  if (hashList[data.hash] && hashList[data.hash].length>1) {
+                    var otherItem = "missing";
+                    hashList[data.hash].forEach(duplicate=>{
+                      if(duplicate.id!==data.id){
+                        otherItem = "Duplicate of..."+ duplicate.path.substring(duplicate.path.length-30);
+                      }
+                    });
+                    $(el)
+                      .find("a > i")
+                      .prepend(
+                        `<i class="fas fa-exclamation-triangle text-danger icon-duplicate" title="${otherItem}"></i>`
+                      );
+                }
               }
             }
             return el;
           };
         };
 
-        // Look for duplicates of hashed files to display
-        const deepLookForDuplicates = node => {
-          if (node.type === "file") {
-            // md5 already exist
-            if (hashList.includes(node.hash)) {
-              // we havn't added it to duplicate list yet
-              if (!hashDuplicates.includes(node.hash)) {
-                hashDuplicates.push(node.hash);
-              }
-            }
+        
 
-            // add md5 hash to list
-            hashList.push(node.hash);
-          }
-          // has children, recursive loop
-          if (node.children) {
-            for (let i = 0; i < node.children.length; i = i + 1) {
-              deepLookForDuplicates(node.children[i]);
+        // Clean filelist 
+        const cleanFileList = (obj) => {
+          if(obj.children && obj.children.length>0){
+            for(let i = obj.children.length-1; i>=0; i--){
+              var item = cleanFileList(obj.children[i])
+              if(item) {
+                obj.children[i] = item;
+              }
+              else {
+                obj.children.splice(i,1);
+                
+              } 
             }
+           return obj;
           }
-        };
+          if(obj.ext!==".txt" && obj.ext!==".bin"){
+            return null;
+          }
+
+          // Checks for duplicates
+          if(!hashList[obj.hash]) hashList[obj.hash] = [];
+          hashList[obj.hash].push(obj);
+          
+          // File we want
+          return obj;
+        }
+
 
         // Load files to populate the tree
         const loadTreeData = (topic, message) => {
@@ -588,17 +603,18 @@
             success: function(data) {
               hashList = [];
               hashDuplicates = [];
-              deepLookForDuplicates(data);
+              data = cleanFileList(data);
               data.state = { opened: true };
               $("#jstree").jstree(true).settings.core.data = data;
               $("#jstree").one("refresh.jstree", () => {
                 if (topic && message) {
+                  
                   // Select the item in tree
-                  const topicTrim = topic.substring(
-                    config.mqtt.subscribeBasePath.length
-                  );
-                  const path = `commands/${topicTrim}/${message}.bin`;
+                  const topicTrim = topic.substring( config.mqtt.subscribeBasePath.length);
+                  const path = `${topicTrim}/${message}.txt`
+                  const pathClient = `commands/${path}`;
                   const id = $.md5(path);
+                  //console.log("tree refreshed", {path, id, topicTrim, topic, pathClient});
                   $("#jstree")
                     .jstree(true)
                     .deselect_all(true);
@@ -642,13 +658,13 @@
         $("#jstree").on("changed.jstree", (e, data) => {
           if (data.node && data.node.type === "file") {
             let p = data.node.original.path;
-            p = p.substr(p.indexOf("/") + 1);
+            //p = p.substr(p.indexOf("/") + 1);
             p = p.substring(p, p.lastIndexOf("."));
             const commands = config.recording.path ? config.recording.path : "commands";
             const p1 = p.substring(p.lastIndexOf("/") + 1);
-            const p2 = p.substring(p.indexOf(commands)+commands.length+1, p.lastIndexOf("/"));
+            const p2 = p.substring(0,p.lastIndexOf("/"));
 
-            console.log("click", {data, p, p1, p2, subscribeBasePath:config.mqtt.subscribeBasePath});
+            //console.log("click", {data, p, p1, p2, subscribeBasePath:config.mqtt.subscribeBasePath});
             $("#inputTopic").val(config.mqtt.subscribeBasePath + p2);
             $("#inputMessage").val(p1);
             $("#btnDelete").attr("disabled", false);

@@ -3,6 +3,7 @@ import _ from 'lodash';
 import logger from '../logger';
 import config from '../config';
 import broadlink from '../broadlink';
+import { fileLoad } from './files';
 
 const playCommand = () => new Promise((resolve, reject) => {
   if (config.queue.length !== 0) {
@@ -22,8 +23,17 @@ const playCommand = () => new Promise((resolve, reject) => {
       }
     }
 
-
-    fs.readFile(data.filePath, (err, fileData) => {
+    fileLoad(data.filePath).then((buffer) => {
+      _.each(data.deviceModules, (deviceItem) => {
+        logger.info(
+          `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}, device: ${deviceItem.mac}`,
+        );
+        deviceItem.sendData(buffer, false);
+      });
+      resolve(data);
+    });
+    /*
+    fs.readFile(data.filePath, 'utf8', (err, fileData) => {
       if (err) {
         return reject(new Error(`Failed to find file: ${data.filePath}`));
       }
@@ -31,10 +41,13 @@ const playCommand = () => new Promise((resolve, reject) => {
         logger.info(
           `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}, device: ${deviceItem.mac}`,
         );
-        deviceItem.sendData(fileData, false);
+        const buff = new Buffer(fileData, 'base64');
+        console.log('send', fileData, buff);
+        deviceItem.sendData(buff, false);
       });
       resolve(data);
     });
+    */
   }
 });
 

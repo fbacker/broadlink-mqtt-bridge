@@ -6,5 +6,3 @@ tmp-*
 .DS_Store
 readme-docker.md
 test/*
-clitest.bin
-clitest.hex

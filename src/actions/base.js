@@ -21,7 +21,6 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
   data.topic = data.topic.toLowerCase();
   data.message = data.message.toLowerCase(); // logging output doesn't work with the name message
 
-
   // const r = /(?:\.*\D)/gi;
   // const e = r.exec(data.message);
   // logger.debug(`Prepare check regex pattern if number ${e} in msg: ${data.message}`);
@@ -51,7 +50,7 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
     config.commandsPath,
     actionPath,
     data.message,
-  )}.bin`;
+  )}`;
   const folderPath = filePath.substr(0, filePath.lastIndexOf('/'));
   const hash = md5(filePath);
 

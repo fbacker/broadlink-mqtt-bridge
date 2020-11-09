@@ -26,12 +26,33 @@ const fileDelete = (filePath) => new Promise((resolve, reject) => {
 const fileSave = (data) => new Promise((resolve, reject) => {
   logger.info(`Save data to file topic ${data.topic}, file: ${data.filePath}`);
   shell.mkdir('-p', data.folderPath);
-  fs.writeFile(data.filePath, data.signal, { flag: 'w' }, (err) => {
+  const converted = data.signal.toString('base64');
+  fs.writeFile(`${data.filePath}.txt`, converted, { flag: 'w', encoding: 'utf8' }, (err) => {
     if (err) {
       reject(new Error('Failed to create file'));
       return;
     }
     resolve(data);
+  });
+});
+
+// Load action
+const fileLoad = (pathToFile) => new Promise((resolve, reject) => {
+  logger.debug(`Load command from ${pathToFile}`);
+  fs.readFile(`${pathToFile}.txt`, 'utf8', (err, data) => {
+    if (err) {
+      logger.warn(`Didn't find file ${pathToFile}, try to load old version`);
+
+      fs.readFile(`${pathToFile}.bin`, (err1, dataBuffer) => {
+        if (err1) {
+          reject(new Error(`Failed to load file ${pathToFile}`));
+        }
+        resolve(dataBuffer);
+      });
+      return;
+    }
+    const buff = Buffer.from(data, 'base64');
+    resolve(buff);
   });
 });
 
@@ -51,17 +72,29 @@ const fileListStructure = (dir) => {
             if (!stats.isDirectory()) {
               return resolve(
                 new Promise((resolve, reject) => {
+                  let icon = null;
+                  switch (path.extname(entry)) {
+                    case '.txt':
+                      icon = 'fas fa-bolt';
+                      break;
+                    case '.bin':
+                      icon = 'fas fa-exclamation';
+                      break;
+                    default:
+                      break;
+                  }
                   md5File(entry).then((hash) => {
+                    const shortName = entry.substring(config.commandsPath.length + 1);
                     resolve({
-                      path: entry,
+                      path: shortName,
                       type: 'file',
-                      text: path.basename(entry),
+                      text: path.parse(entry).name, // path.basename(entry),
+                      ext: path.extname(entry),
                       time: stats.mtime,
                       size: stats.size,
-                      id: md5(entry),
+                      id: md5(shortName),
                       hash,
-                      icon:
-                          path.extname(entry) === '.bin' ? 'fas fa-bolt' : null,
+                      icon,
                     });
                   }).catch((err1) => reject(err1));
                 }),
@@ -74,7 +107,7 @@ const fileListStructure = (dir) => {
                   time: stats.mtime,
                   size: stats.size,
                   id: md5(entry),
-                  icon: path.extname(entry) === ".bin" ? "fas fa-bolt" : null
+                  icon: path.extname(entry) === ".txt" ? "fas fa-bolt" : null
                 });
                 */
             }
@@ -88,13 +121,14 @@ const fileListStructure = (dir) => {
                     files.map((child) => walk(path.join(entry, child))),
                   )
                     .then((children) => {
+                      const shortNameFolder = entry.substring(config.commandsPath.length + 1);
                       resolve({
-                        path: entry,
+                        path: shortNameFolder,
                         type: 'folder',
                         text: path.basename(entry),
                         time: stats.mtime,
                         children,
-                        id: md5(entry),
+                        id: md5(shortNameFolder),
                       });
                     })
                     .catch((err) => {
@@ -148,5 +182,5 @@ const checkCommandFiles = (folderPath) => {
 };
 
 export {
-  checkCommandFiles, fileDelete, fileListStructure, fileSave,
+  checkCommandFiles, fileDelete, fileListStructure, fileSave, fileLoad, checkCommandFilesFlatten,
 };
