@@ -21,3 +21,11 @@ It has a Admin GUI for helping record IR / RF signals. You will be able with the
 If previously been using this service and upgrading you'll need to migrate OpenHAB way of handling things.
 
 Binding MQTT 1.x (legacy) doesn't work. Please use the updated way of handling MQTT messages with OpenHAB. View wiki for examples. There's also example of how to downgrade to latest release of version 1.
+
+## Breaking Changes v2 -> v3
+
+Commands are saved as base64 files to make it easier to copy from/to other systems.
+
+As for now if the new base64 (.txt) file isn't found it will try to run the (.bin) file instead. This can be changed in future releases so make sure to upgrade your commands and don't delete the old files until you are sure that they work.
+
+To migrate existing commands run ```npm run convert``` in the service folder. This will create base64 files of all existing bin files (nothing is deleted).
