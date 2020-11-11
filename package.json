@@ -25,14 +25,14 @@
     "request": "^2.88.2",
     "shelljs": "^0.8.4",
     "socket.io": "^2.3.0",
-    "systeminformation": "^4.27.6",
+    "systeminformation": "^4.29.3",
     "winston": "^3.3.3",
-    "yargs": "^16.0.3"
+    "yargs": "^16.1.0"
   },
   "devDependencies": {
-    "eslint": "^7.10.0",
-    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.6"
   }
 }
