@@ -21,6 +21,7 @@ echo -e "\e[0m"
 PATH_TARGET=$(pwd)
 PATH_FOLDER=broadlink-mqtt-bridge
 PATH_FULL="$PATH_TARGET/$PATH_FOLDER"
+echo -e "\e[96mInstall path ${PATH_FULL}\e[90m"
 
 # Define the tested version of Node.js.
 NODE_TESTED="v10.13.0"
