@@ -8,3 +8,7 @@ github
 installers
 test
 *.md
+.Dockerfile
+.git
+.gitignore
+docker-compose.yml

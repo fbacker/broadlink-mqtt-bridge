@@ -14,6 +14,8 @@ import { prepareAction, addToQueue } from './actions/base';
 import { fileDelete, fileListStructure, fileSave } from './actions/files';
 import { playCommand, queryTemperatureCommand } from './actions/play';
 
+const isDocker = require('is-docker');
+
 let recordAction;
 // -------------------------------------
 //             Webserver
@@ -23,12 +25,18 @@ let recordAction;
 
 class WebserverClass {
   constructor() {
+    this.host = isDocker() ? '0.0.0.0' : '127.0.0.1';
+    logger.info(`Listen on ip ${this.host}`);
+    if (isDocker() && (config.settings.gui.port !== 3000 || config.settings.gui.logs !== 3001)) {
+      logger.error('Cant change gui or log ports on docker container');
+    }
     const app = express();
 
     app.use(express.static('html'));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     this.server = http.createServer(app);
+
     this.io = socket.listen(this.server);
     this.configureSocket(this.io);
     this.configureBroadlink();
@@ -291,7 +299,7 @@ class WebserverClass {
 
   // server is live
   startServer() {
-    this.server.listen(config.settings.gui.port, () => {
+    this.server.listen(config.settings.gui.port, this.host, () => {
       logger.debug(`GUI Web listen on port ${config.settings.gui.port}`);
       // Start to find devices
       const isRunning = broadlink.discoverDevices();
