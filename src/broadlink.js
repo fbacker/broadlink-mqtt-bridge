@@ -10,6 +10,7 @@ class Broadlink {
   constructor() {
     this.loopTimeToFindDevices = 5;
     this.broadlink = new BroadlinkJS();
+    this.devicesLocal = {};
 
     // network callback, device is found
     this.broadlink.on('deviceReady', (device) => {
@@ -23,8 +24,9 @@ class Broadlink {
   }
 
   devices() {
-    const devices = [];
-    return _.each(this.broadlink.devices, (device) => devices.push(device));
+    return this.devicesLocal;
+    // const devices = [];
+    // return _.each(this.broadlink.devices, (device) => devices.push(device));
   }
 
   devicesInfo() {
@@ -49,19 +51,21 @@ class Broadlink {
   }
 
   deviceFillInfo(device) {
+    logger.debug(`device mac to rewrite ${device.mac}`);
     const macAddressParts = device.mac.toString('hex').match(/[\s\S]{1,2}/g) || [];
+    logger.debug('device mac macAddressParts', macAddressParts);
     device.host.macAddress = macAddressParts.join(':');
     device.host.id = macAddressParts.join('');
     device.host.model = device.model;
     device.host.type = device.type;
-    this.broadlink.devices[device.host.id] = device;
+    this.devicesLocal[device.host.id] = device;
   }
 
   // Emit *.255 broadcast to find devices on network
   discoverDevicesLoop(count = 0) {
   // We are finished, stop looking for devices
     if (count === 0) {
-      this.emit('discoverCompleted', Object.keys(this.broadlink.devices).length);
+      this.emit('discoverCompleted', Object.keys(this.devicesLocal).length);
       config.setIsRunningScan(false);
       return;
     }
@@ -85,6 +89,7 @@ class Broadlink {
     config.setIsRunningScan(true);
     // clear
     this.broadlink.devices = {};
+    this.devicesLocal = {};
     this.discoverDevicesLoop(this.loopTimeToFindDevices);
     return true;
   }
