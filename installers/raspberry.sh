@@ -18,7 +18,7 @@ echo ""
 echo -e "\e[0m"
 
 # Location
-PATH_TARGET=pwd
+PATH_TARGET=$(pwd)
 PATH_FOLDER=broadlink-mqtt-bridge
 PATH_FULL="$PATH_TARGET/$PATH_FOLDER"
 
