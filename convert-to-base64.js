@@ -34,9 +34,12 @@ const convertContent = (content) => {
 
 const convertFile = (from, to) => {
   console.log(`  - Convert ${from} to ${to}`);
+  from = path.join(config.commandsPath, from);
+  to = path.join(config.commandsPath, to);
   fs.readFile(from, (err, dataInput) => {
     if (err) {
       console.error(`Error: Read file issue ${err.message}`);
+      return;
     }
     const dataOutput = convertContent(dataInput);
     fs.writeFile(to, dataOutput, { flag: 'w', encoding: 'utf8' }, (err1) => {
