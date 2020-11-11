@@ -128,7 +128,7 @@ fi
 echo -e "\e[92mUpdate System Services\e[0m"
 sudo cp "$PATH_FULL/installers/boot/broadlinkbridge.service" /etc/systemd/system/
 sudo chmod +x /etc/systemd/system/broadlinkbridge.service
-sudo sed --expression "s@FOLDER_PATH_REPLACE@$PATH_FULL@" /etc/systemd/system/broadlinkbridge.service
+sudo sed -i "s@FOLDER_PATH_REPLACE@$PATH_FULL@" /etc/systemd/system/broadlinkbridge.service
 sudo systemctl daemon-reload
 sudo systemctl restart broadlinkbridge.service
 echo -e "\e[92mBroadlink rebooted and ready!\e[0m"
