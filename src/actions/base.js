@@ -63,7 +63,7 @@ const prepareAction = (data) => new Promise((resolve, reject) => {
   }
   if (device) {
     // we want to select specific device
-    const deviceItem = _.find(devices, (d) => d.mac === device);
+    const deviceItem = _.find(devices, (d) => d.host.id === device);
     if (!deviceItem) return reject(new Error('Requested device not found'));
     devicesToUse.push(deviceItem);
   } else {

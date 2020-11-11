@@ -26,7 +26,7 @@ const playCommand = () => new Promise((resolve, reject) => {
     fileLoad(data.filePath).then((buffer) => {
       _.each(data.deviceModules, (deviceItem) => {
         logger.info(
-          `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}, device: ${deviceItem.mac}`,
+          `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}, device: ${deviceItem.host.id}`,
         );
         deviceItem.sendData(buffer, false);
       });
