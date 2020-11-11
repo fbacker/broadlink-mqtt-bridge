@@ -51,7 +51,7 @@ class Broadlink {
   }
 
   deviceFillInfo(device) {
-    logger.debug(`device mac to rewrite ${device.mac}`);
+    logger.debug(`device mac to rewrite ${device.mac} hex: ${device.mac.toString('hex')}`);
     const macAddressParts = device.mac.toString('hex').match(/[\s\S]{1,2}/g) || [];
     logger.debug('device mac macAddressParts', macAddressParts);
     device.host.macAddress = macAddressParts.join(':');
