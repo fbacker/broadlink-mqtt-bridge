@@ -1,8 +1,7 @@
 # sudo for docker
-sudo: true
 dist: xenial
-
-language: nodejs
+os: linux
+language: node_js
 
 services:
   - docker
@@ -34,7 +33,7 @@ script:
 deploy:
   provider: script
   script: bash .travis-deploy.sh
-  skip_cleanup: true
+  cleanup: false
   on:
     tags: true
 

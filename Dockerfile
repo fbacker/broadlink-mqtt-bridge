@@ -12,7 +12,7 @@ RUN mv config/docker.json config/default.json
 RUN rm package-lock.json
 
 # create runtime
-FROM node:alpine as runtime
+FROM --platform=$BUILDPLATFORM node:alpine as runtime
 WORKDIR /app
 VOLUME [ "/config", "/commands" ]
 EXPOSE 3000 3001

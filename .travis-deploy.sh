@@ -25,7 +25,7 @@ buildctl build --frontend dockerfile.v0 \
       --exporter-opt name=docker.io/$container:$TRAVIS_TAG \
       --exporter-opt push=true \
       --frontend-opt platform=$platforms \
-      --frontend-opt filename=./Dockerfile.cross
+      --frontend-opt filename=./Dockerfile
 
 # Push image for every arch with arch prefix in tag
 for arch in $architectures
