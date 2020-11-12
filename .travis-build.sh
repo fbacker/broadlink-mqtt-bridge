@@ -5,7 +5,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 # Login into docker
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
-architectures="arm arm64 amd64"
+architectures="arm arm64 amd64 armhf"
 images=""
 platforms=""
 
@@ -55,9 +55,9 @@ wait
 #do
 #    docker manifest annotate $container:dev $container:dev-$arch --arch $arch    
 #done
-docker pull $container:dev-arm
-docker tag $container:dev-arm $container:dev-armhf
-docker push $container:dev-armhf
+#docker pull $container:dev-arm
+#docker tag $container:dev-arm $container:dev-armhf
+#docker push $container:dev-armhf
 #docker manifest annotate $container:dev $container:dev-armhf --arch armhf
 
 #docker manifest push $container:dev

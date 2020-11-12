@@ -5,7 +5,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 # Login into docker
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
-architectures="arm arm64 amd64"
+architectures="arm arm64 amd64 armhf"
 images=""
 platforms=""
 
@@ -44,23 +44,28 @@ done
 
 wait
 
+
+#docker pull $container:latest-arm
+#docker tag $container:latest-arm $container:latest-armhf
+#docker push $container:latest-armhf
+
 # manifest
-docker manifest create $container:latest \
-    $container:latest-arm \
-    $container:latest-armhf \
-    $container:latest-arm64 \
-    $container:latest-amd64
+#docker manifest create $container:latest \
+#    $container:latest-arm \
+#    $container:latest-armhf \
+#    $container:latest-arm64 \
+#    $container:latest-amd64
 
 # add to manifest
-for arch in $architectures
-do
-    docker manifest annotate $container:latest $container:latest-$arch --arch $arch    
-done
-docker tag $container:latest-arm $container:latest-armhf
-docker push $container:latest-armhf
-docker manifest annotate $container:latest $container:latest-armhf --arch armhf
+#for arch in $architectures
+#do
+#    docker manifest annotate $container:latest $container:latest-$arch --arch $arch    
+#done
+#docker tag $container:latest-arm $container:latest-armhf
+#docker push $container:latest-armhf
+#docker manifest annotate $container:latest $container:latest-armhf --arch armhf
 
-docker manifest push $container:latest
+#docker manifest push $container:latest
 
 
 #docker pull $container:$TRAVIS_TAG-arm
