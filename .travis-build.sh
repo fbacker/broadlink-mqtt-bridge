@@ -2,7 +2,7 @@
 container="fredrickbacker/broadlink-mqtt-bridge"
 
 # Login into docker
-docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 architectures="arm arm64 amd64"
 images=""
@@ -25,7 +25,7 @@ buildctl build --frontend dockerfile.v0 \
       --exporter-opt name=docker.io/$container:test-build \
       --exporter-opt push=true \
       --frontend-opt platform=$platforms \
-      --frontend-opt filename=./Dockerfile.cross
+      --frontend-opt filename=./Dockerfile
 
 # Push image for every arch with arch prefix in tag
 for arch in $architectures
@@ -38,7 +38,7 @@ do
       --exporter-opt name=docker.io/$container:test-build-$arch \
       --exporter-opt push=true \
       --frontend-opt platform=linux/$arch \
-      --frontend-opt filename=./Dockerfile.cross &
+      --frontend-opt filename=./Dockerfile &
 done
 
 wait

@@ -2,7 +2,7 @@
 container="fredrickbacker/broadlink-mqtt-bridge"
 
 # Login into docker
-docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 architectures="arm arm64 amd64"
 images=""
@@ -38,7 +38,7 @@ do
       --exporter-opt name=docker.io/$container:$TRAVIS_TAG-$arch \
       --exporter-opt push=true \
       --frontend-opt platform=linux/$arch \
-      --frontend-opt filename=./Dockerfile.cross &
+      --frontend-opt filename=./Dockerfile &
 done
 
 wait
