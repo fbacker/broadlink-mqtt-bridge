@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 container="fredrickbacker/broadlink-mqtt-bridge"
+export DOCKER_CLI_EXPERIMENTAL=enabled
 
 # Login into docker
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
@@ -42,6 +43,13 @@ do
 done
 
 wait
+
+# manifest
+docker manifest create $container:dev \
+    $container:dev-arm \
+    $container:dev-armhf \
+    $container:dev-arm64 \
+    $container:dev-amd64
 
 for arch in $architectures
 do

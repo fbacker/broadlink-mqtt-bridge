@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 container="fredrickbacker/broadlink-mqtt-bridge"
+export DOCKER_CLI_EXPERIMENTAL=enabled
 
 # Login into docker
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
