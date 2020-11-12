@@ -43,6 +43,6 @@ done
 
 wait
 
-docker pull $container:test-build-arm
-docker tag $container:test-build-arm $container:test-build-armhf
-docker push $container:test-build-armhf
+#docker pull $container:test-build-arm
+#docker tag $container:test-build-arm $container:test-build-armhf
+#docker push $container:test-build-armhf
