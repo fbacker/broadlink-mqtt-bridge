@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM node:alpine
+FROM --platform=$BUILDPLATFORM node:lts-alpine
 WORKDIR /app
 VOLUME [ "/config", "/commands" ]
 EXPOSE 3000 3001
