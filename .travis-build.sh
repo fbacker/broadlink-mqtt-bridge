@@ -2,7 +2,7 @@
 container="fredrickbacker/broadlink-mqtt-bridge"
 
 # Login into docker
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
 architectures="arm arm64 amd64"
 images=""
@@ -22,7 +22,7 @@ buildctl build --frontend dockerfile.v0 \
       --local dockerfile=. \
       --local context=. \
       --exporter image \
-      --exporter-opt name=docker.io/fredrickbacker/broadlink-mqtt-bridge:test-build \
+      --exporter-opt name=docker.io/$container:test-build \
       --exporter-opt push=true \
       --frontend-opt platform=$platforms \
       --frontend-opt filename=./Dockerfile
@@ -35,7 +35,7 @@ do
       --local dockerfile=. \
       --local context=. \
       --exporter image \
-      --exporter-opt name=docker.io/fredrickbacker/broadlink-mqtt-bridge:test-build-$arch \
+      --exporter-opt name=docker.io/$container:test-build-$arch \
       --exporter-opt push=true \
       --frontend-opt platform=linux/$arch \
       --frontend-opt filename=./Dockerfile &
