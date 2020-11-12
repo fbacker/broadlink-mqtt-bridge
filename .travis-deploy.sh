@@ -22,7 +22,7 @@ buildctl build --frontend dockerfile.v0 \
       --local dockerfile=. \
       --local context=. \
       --exporter image \
-      --exporter-opt name=docker.io/$container:latest \
+      --exporter-opt name=docker.io/fredrickbacker/broadlink-mqtt-bridge:latest \
       --exporter-opt push=true \
       --frontend-opt platform=$platforms \
       --frontend-opt filename=./Dockerfile
@@ -35,7 +35,7 @@ do
       --local dockerfile=. \
       --local context=. \
       --exporter image \
-      --exporter-opt name=docker.io/$container:latest-$arch \
+      --exporter-opt name=docker.io/fredrickbacker/broadlink-mqtt-bridge:latest-$arch \
       --exporter-opt push=true \
       --frontend-opt platform=linux/$arch \
       --frontend-opt filename=./Dockerfile &
@@ -44,22 +44,22 @@ done
 wait
 
 # manifest
-docker manifest create $container:latest \
-    $container:latest-arm \
-    $container:latest-armhf \
-    $container:latest-arm64 \
-    $container:latest-amd64
+docker manifest create fredrickbacker/broadlink-mqtt-bridge:latest \
+    fredrickbacker/broadlink-mqtt-bridge:latest-arm \
+    fredrickbacker/broadlink-mqtt-bridge:latest-armhf \
+    fredrickbacker/broadlink-mqtt-bridge:latest-arm64 \
+    fredrickbacker/broadlink-mqtt-bridge:latest-amd64
 
 # add to manifest
 for arch in $architectures
 do
-    docker manifest annotate $container:latest $container:latest-$arch --arch $arch    
+    docker manifest annotate fredrickbacker/broadlink-mqtt-bridge:latest fredrickbacker/broadlink-mqtt-bridge:latest-$arch --arch $arch    
 done
-docker tag $container:latest-arm $container:latest-armhf
-docker push $container:latest-armhf
-docker manifest annotate $container:latest $container:latest-armhf --arch armhf
+docker tag fredrickbacker/broadlink-mqtt-bridge:latest-arm fredrickbacker/broadlink-mqtt-bridge:latest-armhf
+docker push fredrickbacker/broadlink-mqtt-bridge:latest-armhf
+docker manifest annotate fredrickbacker/broadlink-mqtt-bridge:latest fredrickbacker/broadlink-mqtt-bridge:latest-armhf --arch armhf
 
-docker manifest push $container:latest
+docker manifest push fredrickbacker/broadlink-mqtt-bridge:latest
 
 
 #docker pull $container:$TRAVIS_TAG-arm
