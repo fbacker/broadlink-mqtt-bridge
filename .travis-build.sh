@@ -5,7 +5,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 # Login into docker
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
-architectures="arm arm64 amd64 armhf"
+architectures="arm arm64 amd64"
 images=""
 platforms=""
 
