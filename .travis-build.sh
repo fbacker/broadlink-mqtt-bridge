@@ -45,19 +45,19 @@ done
 wait
 
 # manifest
-docker manifest create $container:dev \
-    $container:dev-arm \
-    $container:dev-armhf \
-    $container:dev-arm64 \
-    $container:dev-amd64
+#docker manifest create $container:dev \
+#    $container:dev-arm \
+#    $container:dev-armhf \
+#    $container:dev-arm64 \
+#    $container:dev-amd64
 
-for arch in $architectures
-do
-    docker manifest annotate $container:dev $container:dev-$arch --arch $arch    
-done
+#for arch in $architectures
+#do
+#    docker manifest annotate $container:dev $container:dev-$arch --arch $arch    
+#done
 docker tag $container:dev-arm $container:dev-armhf
 docker push $container:dev-armhf
-docker manifest annotate $container:dev $container:dev-armhf --arch armhf
+#docker manifest annotate $container:dev $container:dev-armhf --arch armhf
 
 docker manifest push $container:dev
 
