@@ -55,11 +55,12 @@ wait
 #do
 #    docker manifest annotate $container:dev $container:dev-$arch --arch $arch    
 #done
+docker pull $container:dev-arm
 docker tag $container:dev-arm $container:dev-armhf
 docker push $container:dev-armhf
 #docker manifest annotate $container:dev $container:dev-armhf --arch armhf
 
-docker manifest push $container:dev
+#docker manifest push $container:dev
 
 #docker pull $container:test-build-arm
 #docker tag $container:test-build-arm $container:test-build-armhf
