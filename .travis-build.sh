@@ -5,28 +5,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 # Login into docker
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
-architectures="arm arm64 amd64 arm32v7"
-images=""
-platforms=""
-
-for arch in $architectures
-do
-# Build for all architectures and push manifest
-  platforms="linux/$arch,$platforms"
-done
-
-platforms=${platforms::-1}
-
-
-# Push multi-arch image
-buildctl build --frontend dockerfile.v0 \
-      --local dockerfile=. \
-      --local context=. \
-      --exporter image \
-      --exporter-opt name=docker.io/$container:dev \
-      --exporter-opt push=true \
-      --frontend-opt platform=$platforms \
-      --frontend-opt filename=./Dockerfile
+architectures="amd64 x86_64 arm32v7 armhf arm64v8"
 
 # Push image for every arch with arch prefix in tag
 for arch in $architectures
@@ -38,7 +17,7 @@ do
       --exporter image \
       --exporter-opt name=docker.io/$container:dev-$arch \
       --exporter-opt push=true \
-      --frontend-opt platform=linux/$arch \
+      --frontend-opt arch=$arch \
       --frontend-opt filename=./Dockerfile &
 done
 

@@ -27,15 +27,16 @@ before_install:
 # in vendor/
 install: true
 
+
 script:
   - bash .travis-build.sh
 
-deploy:
-  provider: script
-  script: bash .travis-deploy.sh
-  cleanup: false
-  on:
-    tags: true
+#deploy:
+#  provider: script
+#  script: bash .travis-deploy.sh
+#  cleanup: false
+#  on:
+#    tags: true
 
 # Don't email me the results of the test runs.
 notifications:

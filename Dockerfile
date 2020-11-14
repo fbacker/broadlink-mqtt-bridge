@@ -1,4 +1,6 @@
-FROM --platform=$BUILDPLATFORM node:lts-alpine
+# amd64 x86_64 arm32v7 armhf arm64v8
+ARG arch=amd64
+FROM yobasystems/alpine-nodejs:min-${arch}
 WORKDIR /app
 VOLUME [ "/config", "/commands" ]
 EXPOSE 3000 3001
