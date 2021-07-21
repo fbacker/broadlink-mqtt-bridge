@@ -1,43 +1,16 @@
-# sudo for docker
 dist: xenial
-os: linux
-language: node_js
-
-services:
-  - docker
-
-addons:
-  apt:
-    packages:
-      - docker-ce
-
-# Only clone the most recent commit.
-git:
-  depth: 1
-
-# install qemu-user before running docker build
+sudo: required
+env:
+  global:
+    - DOCKER_REPO=fbacker/broadlink-mqtt-bridge
+if: tag IS present
 before_install:
-  - sudo docker run --privileged linuxkit/binfmt:v0.6
-  - sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
-  - sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
-  - export BUILDKIT_HOST=tcp://0.0.0.0:1234
-
-
-# Skip the install step. Don't `go get` dependencies. Only build with the code
-# in vendor/
-install: true
-
-
-script:
-  - bash .travis-build.sh
-
-#deploy:
-#  provider: script
-#  script: bash .travis-deploy.sh
-#  cleanup: false
-#  on:
-#    tags: true
-
-# Don't email me the results of the test runs.
-notifications:
-  email: false
+  - curl -fsSL https://get.docker.com | sh
+  - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
+  - mkdir -p $HOME/.docker
+  - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
+  - sudo service docker start
+install:
+  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  - docker buildx create --name xbuilder --use
+script: bash travis-ci.sh

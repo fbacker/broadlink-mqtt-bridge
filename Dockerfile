@@ -1,6 +1,4 @@
-# amd64 x86_64 arm32v7 armhf arm64v8
-ARG arch=amd64
-FROM yobasystems/alpine-nodejs:min-${arch}
+FROM node:14.17.3-alpine
 WORKDIR /app
 VOLUME [ "/config", "/commands" ]
 EXPOSE 3000 3001
