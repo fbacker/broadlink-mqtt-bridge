@@ -3,7 +3,7 @@ import _ from 'lodash';
 import logger from '../logger';
 import config from '../config';
 import broadlink from '../broadlink';
-import { fileLoad } from './files';
+import { fileLoad } from '../../src/actions/files';
 
 const playCommand = () => new Promise((resolve, reject) => {
   if (config.queue.length !== 0) {

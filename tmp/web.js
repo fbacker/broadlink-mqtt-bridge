@@ -5,13 +5,13 @@ import socket from 'socket.io';
 import bodyParser from 'body-parser';
 import request from 'request';
 import sysinfo from 'systeminformation';
-
+ 
 import broadlink from './broadlink';
 import mqtt from './mqtt';
 import config from './config';
 import logger from './logger';
 import { prepareAction, addToQueue } from './actions/base';
-import { fileDelete, fileListStructure, fileSave } from './actions/files';
+import { fileDelete, fileListStructure, fileSave } from '../src/actions/files';
 import { playCommand, queryTemperatureCommand } from './actions/play';
 
 const isDocker = require('is-docker');
