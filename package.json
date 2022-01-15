@@ -24,7 +24,7 @@
     "md5-file": "^5.0.0",
     "mqtt": "^4.2.1",
     "request": "^2.88.2",
-    "shelljs": "^0.8.4",
+    "shelljs": "^0.8.5",
     "socket.io": "^2.3.0",
     "systeminformation": "^4.29.3",
     "winston": "^3.3.3",
