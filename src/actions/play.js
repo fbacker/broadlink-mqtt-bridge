@@ -1,4 +1,3 @@
-import fs from 'fs';
 import _ from 'lodash';
 import logger from '../logger';
 import config from '../config';
@@ -31,23 +30,7 @@ const playCommand = () => new Promise((resolve, reject) => {
         deviceItem.sendData(buffer, false);
       });
       resolve(data);
-    });
-    /*
-    fs.readFile(data.filePath, 'utf8', (err, fileData) => {
-      if (err) {
-        return reject(new Error(`Failed to find file: ${data.filePath}`));
-      }
-      _.each(data.deviceModules, (deviceItem) => {
-        logger.info(
-          `Send command topic: ${data.topic}, message: ${data.message}, file: ${data.path}/${data.message}, device: ${deviceItem.mac}`,
-        );
-        const buff = new Buffer(fileData, 'base64');
-        console.log('send', fileData, buff);
-        deviceItem.sendData(buff, false);
-      });
-      resolve(data);
-    });
-    */
+    }).catch(reject);
   }
 });
 
