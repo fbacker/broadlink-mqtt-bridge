@@ -657,16 +657,16 @@
         // CLICK IN TREE
         $("#jstree").on("changed.jstree", (e, data) => {
           if (data.node && data.node.type === "file") {
-            let p = data.node.original.path;
-            //p = p.substr(p.indexOf("/") + 1);
-            p = p.substring(p, p.lastIndexOf("."));
+            // Convert Windows path separators with linux ones so they can be dealt with in the same way
+            let filePath = data.node.original.path.replaceAll("\\", "/");
+            let comandPath = filePath.substring(filePath, filePath.lastIndexOf("."));
             const commands = config.recording.path ? config.recording.path : "commands";
-            const p1 = p.substring(p.lastIndexOf("/") + 1);
-            const p2 = p.substring(0,p.lastIndexOf("/"));
+            const message = comandPath.substring(comandPath.lastIndexOf("/") + 1);
+            const topic = comandPath.substring(0,comandPath.lastIndexOf("/"));
 
-            //console.log("click", {data, p, p1, p2, subscribeBasePath:config.mqtt.subscribeBasePath});
-            $("#inputTopic").val(config.mqtt.subscribeBasePath + p2);
-            $("#inputMessage").val(p1);
+            // console.log("click", {data, filePath, comandPath, message, topic, subscribeBasePath:config.mqtt.subscribeBasePath});
+            $("#inputTopic").val(config.mqtt.subscribeBasePath + topic);
+            $("#inputMessage").val(message);
             $("#btnDelete").attr("disabled", false);
             selectedNode = data.node.original;
           } else {
