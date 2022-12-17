@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import util from 'util';
 import { EventEmitter } from 'events';
-import BroadlinkJS from 'broadlinkjs-rm';
+import BroadlinkJS from 'kiwicam-broadlinkjs-rm';
 
 import logger from './logger';
 import config from './config';
